@@ -8,18 +8,18 @@ const ListaProcessos = () => {
   const [processos, setProcessos] = useState([
     { id: 1, nome: 'João Silva', tipoPessoa: 'física', cpfCnpj: '123.456.789-00', mensagem: 'Solicitação de processo X' },
     { id: 2, nome: 'Empresa ABC', tipoPessoa: 'jurídica', cpfCnpj: '12.345.678/0001-99', mensagem: 'Solicitação de processo Y' },
-    // Adicione mais processos conforme necessário
+   
   ]);
 
   const handleEdit = (id) => {
     console.log('Editar processo com ID:', id);
-    // Lógica para editar o processo
+  
   };
 
   const handleDelete = (id) => {
     setProcessos(processos.filter(processo => processo.id !== id));
     console.log('Excluir processo com ID:', id);
-    // Lógica para excluir o processo (ex. chamada à API)
+    
   };
 
   return (
@@ -34,6 +34,7 @@ const ListaProcessos = () => {
               <TableCell>Nome</TableCell>
               <TableCell>Tipo de Pessoa</TableCell>
               <TableCell>CPF/CNPJ</TableCell>
+              <TableCell>Tipo de Processo</TableCell>
               <TableCell>Mensagem</TableCell>
               <TableCell>Ações</TableCell>
             </TableRow>
@@ -44,6 +45,7 @@ const ListaProcessos = () => {
                 <TableCell>{processo.nome}</TableCell>
                 <TableCell>{processo.tipoPessoa}</TableCell>
                 <TableCell>{processo.cpfCnpj}</TableCell>
+                <TableCell>{processo.tipo}</TableCell>
                 <TableCell>{processo.mensagem}</TableCell>
                 <TableCell>
                   <Button
