@@ -34,12 +34,21 @@ const ListaProcessos = () => {
     }
   };
 
+  const formatarCpfCnpj = (valor) => {
+    if (valor.length === 11) {
+      return valor.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    } else if (valor.length === 14) {
+      return valor.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+    }
+    return valor;
+  };
+
   return (
     <Container maxWidth="lg">
-      <Paper elevation={3} sx={{ padding: 4, marginTop: 4 }}>
-        <Typography variant="h4" gutterBottom color="primary" align="center">
-          Lista de Processos
-        </Typography>
+      <Typography variant="h4" gutterBottom color="primary">
+        Lista de Processos
+      </Typography>
+      <Paper elevation={3} sx={{ padding: 4 }}>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -55,7 +64,7 @@ const ListaProcessos = () => {
               {processos.map((processo) => (
                 <TableRow key={processo.id}>
                   <TableCell>{processo.nome}</TableCell>
-                  <TableCell>{processo.cpf}</TableCell>
+                  <TableCell>{formatarCpfCnpj(processo.cpf)}</TableCell>
                   <TableCell>{processo.descricao}</TableCell>
                   <TableCell>{processo.setor ? processo.setor.nome : 'Setor Intermediário'}</TableCell>
                   <TableCell>
@@ -64,7 +73,7 @@ const ListaProcessos = () => {
                       color="primary"
                       startIcon={<EditIcon />}
                       onClick={() => handleEdit(processo.id)}
-                      sx={{ marginRight: 1 }}
+                      style={{ marginRight: 8 }}
                     >
                       Editar
                     </Button>

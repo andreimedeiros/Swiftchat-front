@@ -14,6 +14,7 @@ const CadastroProcesso = () => {
 
     const processo = {
       nome,
+      usuario: nome,  // Usando o campo 'nome' para satisfazer o backend
       tipoPessoa,
       cpf,
       tipoProcesso: { id: tipoProcesso },
