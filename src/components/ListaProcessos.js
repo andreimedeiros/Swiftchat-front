@@ -3,9 +3,12 @@ import { Container, Typography, Table, TableBody, TableCell, TableContainer, Tab
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import api from '../services/api';
+import EditarProcesso from './EditarProcesso';
 
 const ListaProcessos = () => {
   const [processos, setProcessos] = useState([]);
+  const [selectedProcessoId, setSelectedProcessoId] = useState(null);
+  const [openEditModal, setOpenEditModal] = useState(false);
 
   useEffect(() => {
     fetchProcessos();
@@ -21,14 +24,14 @@ const ListaProcessos = () => {
   };
 
   const handleEdit = (id) => {
-    console.log('Editar processo com ID:', id);
+    setSelectedProcessoId(id);
+    setOpenEditModal(true);
   };
 
   const handleDelete = async (id) => {
     try {
       await api.delete(`/processos/${id}`);
       setProcessos(processos.filter(processo => processo.id !== id));
-      console.log('Excluir processo com ID:', id);
     } catch (error) {
       console.error('Erro ao excluir processo:', error);
     }
@@ -57,6 +60,7 @@ const ListaProcessos = () => {
                 <TableCell>CPF/CNPJ</TableCell>
                 <TableCell>Descrição</TableCell>
                 <TableCell>Setor Atual</TableCell>
+                <TableCell>Tipo de Processo</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -67,6 +71,7 @@ const ListaProcessos = () => {
                   <TableCell>{formatarCpfCnpj(processo.cpf)}</TableCell>
                   <TableCell>{processo.descricao}</TableCell>
                   <TableCell>{processo.setor ? processo.setor.nome : 'Setor Intermediário'}</TableCell>
+                  <TableCell>{processo.tipoProcesso ? processo.tipoProcesso.nome : 'Não Definido'}</TableCell>
                   <TableCell>
                     <Button
                       variant="outlined"
@@ -92,6 +97,12 @@ const ListaProcessos = () => {
           </Table>
         </TableContainer>
       </Paper>
+      <EditarProcesso
+        open={openEditModal}
+        onClose={() => setOpenEditModal(false)}
+        processoId={selectedProcessoId}
+        refreshList={fetchProcessos}
+      />
     </Container>
   );
 };
