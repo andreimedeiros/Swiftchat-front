@@ -4,33 +4,33 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import api from '../services/api';
 
-const ListaProcessos = () => {
-  const [processos, setProcessos] = useState([]);
+const ListaTiposProcessos = () => {
+  const [tiposProcessos, setTiposProcessos] = useState([]);
 
   useEffect(() => {
-    fetchProcessos();
+    fetchTiposProcessos();
   }, []);
 
-  const fetchProcessos = async () => {
+  const fetchTiposProcessos = async () => {
     try {
-      const response = await api.get('/processos');
-      setProcessos(response.data);
+      const response = await api.get('/tiposprocessos');
+      setTiposProcessos(response.data);
     } catch (error) {
-      console.error('Erro ao buscar processos:', error);
+      console.error('Erro ao buscar tipos de processos:', error);
     }
   };
 
   const handleEdit = (id) => {
-    console.log('Editar processo com ID:', id);
+    console.log('Editar tipo de processo com ID:', id);
   };
 
   const handleDelete = async (id) => {
     try {
-      await api.delete(`/processos/${id}`);
-      setProcessos(processos.filter(processo => processo.id !== id));
-      console.log('Excluir processo com ID:', id);
+      await api.delete(`/tiposprocessos/${id}`);
+      setTiposProcessos(tiposProcessos.filter(tipo => tipo.id !== id));
+      console.log('Excluir tipo de processo com ID:', id);
     } catch (error) {
-      console.error('Erro ao excluir processo:', error);
+      console.error('Erro ao excluir tipo de processo:', error);
     }
   };
 
@@ -38,32 +38,26 @@ const ListaProcessos = () => {
     <Container maxWidth="lg">
       <Paper elevation={3} sx={{ padding: 4, marginTop: 4 }}>
         <Typography variant="h4" gutterBottom color="primary" align="center">
-          Lista de Processos
+          Lista de Tipos de Processos
         </Typography>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Nome</TableCell>
-                <TableCell>CPF/CNPJ</TableCell>
-                <TableCell>Descrição</TableCell>
-                <TableCell>Setor Atual</TableCell>
+                <TableCell>Nome do Tipo de Processo</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {processos.map((processo) => (
-                <TableRow key={processo.id}>
-                  <TableCell>{processo.nome}</TableCell>
-                  <TableCell>{processo.cpf}</TableCell>
-                  <TableCell>{processo.descricao}</TableCell>
-                  <TableCell>{processo.setor ? processo.setor.nome : 'Setor Intermediário'}</TableCell>
+              {tiposProcessos.map((tipo) => (
+                <TableRow key={tipo.id}>
+                  <TableCell>{tipo.nome}</TableCell>
                   <TableCell>
                     <Button
                       variant="outlined"
                       color="primary"
                       startIcon={<EditIcon />}
-                      onClick={() => handleEdit(processo.id)}
+                      onClick={() => handleEdit(tipo.id)}
                       sx={{ marginRight: 1 }}
                     >
                       Editar
@@ -72,7 +66,7 @@ const ListaProcessos = () => {
                       variant="outlined"
                       color="error"
                       startIcon={<DeleteIcon />}
-                      onClick={() => handleDelete(processo.id)}
+                      onClick={() => handleDelete(tipo.id)}
                     >
                       Excluir
                     </Button>
@@ -87,4 +81,4 @@ const ListaProcessos = () => {
   );
 };
 
-export default ListaProcessos;
+export default ListaTiposProcessos;

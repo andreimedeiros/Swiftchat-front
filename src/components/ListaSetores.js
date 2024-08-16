@@ -4,33 +4,33 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import api from '../services/api';
 
-const ListaProcessos = () => {
-  const [processos, setProcessos] = useState([]);
+const ListaSetores = () => {
+  const [setores, setSetores] = useState([]);
 
   useEffect(() => {
-    fetchProcessos();
+    fetchSetores();
   }, []);
 
-  const fetchProcessos = async () => {
+  const fetchSetores = async () => {
     try {
-      const response = await api.get('/processos');
-      setProcessos(response.data);
+      const response = await api.get('/setores');
+      setSetores(response.data);
     } catch (error) {
-      console.error('Erro ao buscar processos:', error);
+      console.error('Erro ao buscar setores:', error);
     }
   };
 
   const handleEdit = (id) => {
-    console.log('Editar processo com ID:', id);
+    console.log('Editar setor com ID:', id);
   };
 
   const handleDelete = async (id) => {
     try {
-      await api.delete(`/processos/${id}`);
-      setProcessos(processos.filter(processo => processo.id !== id));
-      console.log('Excluir processo com ID:', id);
+      await api.delete(`/setores/${id}`);
+      setSetores(setores.filter(setor => setor.id !== id));
+      console.log('Excluir setor com ID:', id);
     } catch (error) {
-      console.error('Erro ao excluir processo:', error);
+      console.error('Erro ao excluir setor:', error);
     }
   };
 
@@ -38,32 +38,26 @@ const ListaProcessos = () => {
     <Container maxWidth="lg">
       <Paper elevation={3} sx={{ padding: 4, marginTop: 4 }}>
         <Typography variant="h4" gutterBottom color="primary" align="center">
-          Lista de Processos
+          Lista de Setores
         </Typography>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Nome</TableCell>
-                <TableCell>CPF/CNPJ</TableCell>
-                <TableCell>Descrição</TableCell>
-                <TableCell>Setor Atual</TableCell>
+                <TableCell>Nome do Setor</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {processos.map((processo) => (
-                <TableRow key={processo.id}>
-                  <TableCell>{processo.nome}</TableCell>
-                  <TableCell>{processo.cpf}</TableCell>
-                  <TableCell>{processo.descricao}</TableCell>
-                  <TableCell>{processo.setor ? processo.setor.nome : 'Setor Intermediário'}</TableCell>
+              {setores.map((setor) => (
+                <TableRow key={setor.id}>
+                  <TableCell>{setor.nome}</TableCell>
                   <TableCell>
                     <Button
                       variant="outlined"
                       color="primary"
                       startIcon={<EditIcon />}
-                      onClick={() => handleEdit(processo.id)}
+                      onClick={() => handleEdit(setor.id)}
                       sx={{ marginRight: 1 }}
                     >
                       Editar
@@ -72,7 +66,7 @@ const ListaProcessos = () => {
                       variant="outlined"
                       color="error"
                       startIcon={<DeleteIcon />}
-                      onClick={() => handleDelete(processo.id)}
+                      onClick={() => handleDelete(setor.id)}
                     >
                       Excluir
                     </Button>
@@ -87,4 +81,4 @@ const ListaProcessos = () => {
   );
 };
 
-export default ListaProcessos;
+export default ListaSetores;
