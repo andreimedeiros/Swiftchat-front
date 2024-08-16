@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, FormControl, InputLabel, Select, MenuItem, Button, Paper } from '@mui/material';
+import { Container, Typography, FormControl, InputLabel, Select, MenuItem, Button, Paper, Snackbar, Alert } from '@mui/material';
 import api from '../services/api';
 
 const MovimentarProcesso = () => {
@@ -7,6 +7,10 @@ const MovimentarProcesso = () => {
   const [processoSelecionado, setProcessoSelecionado] = useState('');
   const [setores, setSetores] = useState([]);
   const [setorDestino, setSetorDestino] = useState('');
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   useEffect(() => {
     fetchProcessos();
@@ -34,12 +38,16 @@ const MovimentarProcesso = () => {
   const handleMovimentar = async () => {
     try {
       await api.put(`/processos/${processoSelecionado}/setor/${setorDestino}`);
-      alert('Processo movimentado com sucesso!');
+      setSnackbarMessage('Processo movimentado com sucesso!');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
       setProcessoSelecionado('');
       setSetorDestino('');
     } catch (error) {
       console.error('Erro ao movimentar processo:', error);
-      alert('Erro ao movimentar processo.');
+      setSnackbarMessage('Erro ao movimentar processo.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
     }
   };
 
@@ -50,6 +58,10 @@ const MovimentarProcesso = () => {
       return valor.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
     }
     return valor;
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   return (
@@ -67,7 +79,7 @@ const MovimentarProcesso = () => {
           >
             {processos.map((processo) => (
               <MenuItem key={processo.id} value={processo.id}>
-                {processo.nome} - {formatarCpfCnpj(processo.cpf)}
+                {processo.nome} - {formatarCpfCnpj(processo.cpf)} (Setor atual: {processo.setor ? processo.setor.nome : 'Intermediário'})
               </MenuItem>
             ))}
           </Select>
@@ -92,6 +104,17 @@ const MovimentarProcesso = () => {
           Movimentar
         </Button>
       </Paper>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

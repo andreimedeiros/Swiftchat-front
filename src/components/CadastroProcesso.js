@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, TextField, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Button, Typography, MenuItem, Select, InputLabel, Paper } from '@mui/material';
+import { Container, TextField, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Button, Typography, MenuItem, Select, InputLabel, Paper, Snackbar, Alert } from '@mui/material';
 import api from '../services/api';
 
 const CadastroProcesso = () => {
@@ -8,6 +8,14 @@ const CadastroProcesso = () => {
   const [cpf, setCpf] = useState('');
   const [tipoProcesso, setTipoProcesso] = useState('');
   const [descricao, setDescricao] = useState('');
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -23,7 +31,9 @@ const CadastroProcesso = () => {
 
     try {
       await api.post('/processos', processo);
-      alert('Processo criado com sucesso!');
+      setSnackbarMessage('Processo criado com sucesso!');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
       setNome('');
       setTipoPessoa('física');
       setCpf('');
@@ -31,7 +41,9 @@ const CadastroProcesso = () => {
       setDescricao('');
     } catch (error) {
       console.error('Erro ao criar processo:', error);
-      alert('CPF/CNPJ já utilizado em um processo. Aguarde a conclusão do mesmo.');
+      setSnackbarMessage('CPF/CNPJ já utilizado em um processo. Aguarde a conclusão do mesmo.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
     }
   };
 
@@ -104,6 +116,17 @@ const CadastroProcesso = () => {
           </Button>
         </form>
       </Paper>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
