@@ -67,7 +67,7 @@ const EditarProcesso = ({ open, onClose, processoId, refreshList }) => {
           value={processo.descricao || ''}
           onChange={handleChange}
         />
-        {/* Adicione outros campos conforme necessário */}
+        
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancelar</Button>
