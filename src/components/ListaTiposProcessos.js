@@ -37,14 +37,14 @@ const ListaTiposProcessos = () => {
   return (
     <Container maxWidth="lg">
       <Paper elevation={3} sx={{ padding: 4, marginTop: 4 }}>
-        <Typography variant="h4" gutterBottom color="primary" align="center">
-          Lista de Tipos de Processos
+        <Typography variant="h4" gutterBottom color="primary">
+          Tipos de processos disponíveis
         </Typography>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Nome do Tipo de Processo</TableCell>
+                <TableCell>Tipo de Processo</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>

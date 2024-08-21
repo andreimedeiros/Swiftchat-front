@@ -51,15 +51,6 @@ const MovimentarProcesso = () => {
     }
   };
 
-  const formatarCpfCnpj = (valor) => {
-    if (valor.length === 11) {
-      return valor.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-    } else if (valor.length === 14) {
-      return valor.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
-    }
-    return valor;
-  };
-
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
@@ -79,7 +70,7 @@ const MovimentarProcesso = () => {
           >
             {processos.map((processo) => (
               <MenuItem key={processo.id} value={processo.id}>
-                {processo.nome} - {formatarCpfCnpj(processo.cpf)} (Setor atual: {processo.setor ? processo.setor.nome : 'Intermediário'})
+                {`Processo Nº ${processo.numeroProcesso} (Setor atual: ${processo.setor ? processo.setor.nome : 'Intermediário'})`}
               </MenuItem>
             ))}
           </Select>

@@ -37,8 +37,8 @@ const ListaSetores = () => {
   return (
     <Container maxWidth="lg">
       <Paper elevation={3} sx={{ padding: 4, marginTop: 4 }}>
-        <Typography variant="h4" gutterBottom color="primary" align="center">
-          Lista de Setores
+        <Typography variant="h4" gutterBottom color="primary">
+          Setores
         </Typography>
         <TableContainer component={Paper}>
           <Table>

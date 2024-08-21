@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, TextField, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Button, Typography, MenuItem, Select, InputLabel, Paper, Snackbar, Alert } from '@mui/material';
 import api from '../services/api';
 
@@ -8,13 +8,49 @@ const CadastroProcesso = () => {
   const [cpf, setCpf] = useState('');
   const [tipoProcesso, setTipoProcesso] = useState('');
   const [descricao, setDescricao] = useState('');
+  const [tiposProcesso, setTiposProcesso] = useState([]);
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
+  useEffect(() => {
+    fetchTiposProcesso();
+  }, []);
+
+  const fetchTiposProcesso = async () => {
+    try {
+      const response = await api.get('/tiposprocessos');
+      setTiposProcesso(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar tipos de processos:', error);
+    }
+  };
+
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
+  };
+
+  const formatarCpfCnpj = (valor) => {
+    valor = valor.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+
+    if (tipoPessoa === 'física' && valor.length <= 11) {
+      valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+      valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+      valor = valor.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    } else if (tipoPessoa === 'jurídica' && valor.length <= 14) {
+      valor = valor.replace(/(\d{2})(\d)/, '$1.$2');
+      valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+      valor = valor.replace(/(\d{3})(\d)/, '$1/$2');
+      valor = valor.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+    }
+
+    return valor;
+  };
+
+  const handleCpfChange = (event) => {
+    const valorFormatado = formatarCpfCnpj(event.target.value);
+    setCpf(valorFormatado);
   };
 
   const handleSubmit = async (event) => {
@@ -22,9 +58,9 @@ const CadastroProcesso = () => {
 
     const processo = {
       nome,
-      usuario: nome,  // Usando o campo 'nome' pra satisfazer o backend
+      usuario: nome,  // Usando o campo 'nome' para satisfazer o backend
       tipoPessoa,
-      cpf,
+      cpf: cpf.replace(/\D/g, ''),  // Remove a formatação antes de enviar para o backend
       tipoProcesso: { id: tipoProcesso },
       descricao,
     };
@@ -82,7 +118,7 @@ const CadastroProcesso = () => {
             fullWidth
             margin="normal"
             value={cpf}
-            onChange={(e) => setCpf(e.target.value)}
+            onChange={handleCpfChange}
             required
           />
 
@@ -93,9 +129,11 @@ const CadastroProcesso = () => {
               onChange={(e) => setTipoProcesso(e.target.value)}
               label="Tipo de Processo"
             >
-              <MenuItem value={1}>Licença de Resíduos Sólidos</MenuItem>
-              <MenuItem value={2}>Licença Prévia</MenuItem>
-              <MenuItem value={3}>Licença de Operação</MenuItem>
+              {tiposProcesso.map((tipo) => (
+                <MenuItem key={tipo.id} value={tipo.id}>
+                  {tipo.nome}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
 
