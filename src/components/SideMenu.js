@@ -6,6 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CategoryIcon from '@mui/icons-material/Category';
 import BusinessIcon from '@mui/icons-material/Business';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import PersonAddIcon from '@mui/icons-material/PersonAdd'; // Ícone para Cadastro de Usuário
 
 const SideMenu = ({ open, onClose, onMenuClick }) => {
   return (
@@ -23,6 +24,13 @@ const SideMenu = ({ open, onClose, onMenuClick }) => {
             <HomeIcon style={{ color: '#ffffff' }} />
           </ListItemIcon>
           <ListItemText primary="Tela Inicial" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
+        </ListItem>
+        <Divider style={{ backgroundColor: '#2196f3' }} />
+        <ListItem button onClick={() => onMenuClick('cadastrarUsuario')} style={{ justifyContent: 'center' }}>
+          <ListItemIcon>
+            <PersonAddIcon style={{ color: '#ffffff' }} />
+          </ListItemIcon>
+          <ListItemText primary="Cadastrar Usuário" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
         </ListItem>
         <Divider style={{ backgroundColor: '#2196f3' }} />
         <ListItem button onClick={() => onMenuClick('list')} style={{ justifyContent: 'center' }}>
@@ -59,6 +67,7 @@ const SideMenu = ({ open, onClose, onMenuClick }) => {
           </ListItemIcon>
           <ListItemText primary="Movimentar Processo" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
         </ListItem>
+        <Divider style={{ backgroundColor: '#2196f3' }} />
       </List>
     </Drawer>
   );
