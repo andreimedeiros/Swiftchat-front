@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Container, TextField, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Button, Typography, Paper, Snackbar, Alert } from '@mui/material';
 
 const CadastroUsuario = () => {
+  const [tipoPessoa, setTipoPessoa] = useState('fisica');
   const [cpf, setCpf] = useState('');
   const [cnpj, setCnpj] = useState('');
   const [nome, setNome] = useState('');
@@ -50,6 +51,7 @@ const CadastroUsuario = () => {
       setSenha('');
       setConfirmarSenha('');
       setTipoUsuario('1');
+      setTipoPessoa('fisica');
     } catch (error) {
       console.error('Erro ao cadastrar usuário:', error);
       setSnackbarMessage('Erro ao cadastrar usuário. Verifique os campos e tente novamente.');
@@ -65,44 +67,75 @@ const CadastroUsuario = () => {
           Cadastro de Usuário
         </Typography>
         <form onSubmit={handleSubmit}>
-          <TextField
-            label="CPF"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={cpf}
-            onChange={(e) => setCpf(e.target.value)}
-            required
-          />
+          <FormControl component="fieldset" margin="normal" fullWidth>
+            <FormLabel component="legend">Tipo de Pessoa</FormLabel>
+            <RadioGroup
+              value={tipoPessoa}
+              onChange={(e) => setTipoPessoa(e.target.value)}
+              row
+            >
+              <FormControlLabel value="fisica" control={<Radio />} label="Pessoa Física" />
+              <FormControlLabel value="juridica" control={<Radio />} label="Pessoa Jurídica" />
+            </RadioGroup>
+          </FormControl>
 
-          <TextField
-            label="CNPJ"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={cnpj}
-            onChange={(e) => setCnpj(e.target.value)}
-          />
+          {tipoPessoa === 'fisica' && (
+            <>
+              <TextField
+                label="Nome"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                required
+              />
 
-          <TextField
-            label="Nome"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            required
-          />
+              <TextField
+                label="Sobrenome"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={sobrenome}
+                onChange={(e) => setSobrenome(e.target.value)}
+                required
+              />
 
-          <TextField
-            label="Sobrenome"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={sobrenome}
-            onChange={(e) => setSobrenome(e.target.value)}
-            required
-          />
+              <TextField
+                label="CPF"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={cpf}
+                onChange={(e) => setCpf(e.target.value)}
+                required
+              />
+            </>
+          )}
+
+          {tipoPessoa === 'juridica' && (
+            <>
+              <TextField
+                label="Nome da Empresa"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                required
+              />
+
+              <TextField
+                label="CNPJ"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={cnpj}
+                onChange={(e) => setCnpj(e.target.value)}
+                required
+              />
+            </>
+          )}
 
           <TextField
             label="Senha"
@@ -125,19 +158,6 @@ const CadastroUsuario = () => {
             onChange={(e) => setConfirmarSenha(e.target.value)}
             required
           />
-
-          <FormControl component="fieldset" margin="normal" fullWidth>
-            <FormLabel component="legend">Tipo de Usuário</FormLabel>
-            <RadioGroup
-              value={tipoUsuario}
-              onChange={(e) => setTipoUsuario(e.target.value)}
-              row
-            >
-              <FormControlLabel value="1" control={<Radio />} label="Usuário Comum" />
-              <FormControlLabel value="2" control={<Radio />} label="Funcionário" />
-            </RadioGroup>
-          </FormControl>
-
           <Button type="submit" variant="contained" color="primary" sx={{ marginTop: 2 }}>
             Cadastrar
           </Button>
