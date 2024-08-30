@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Container, TextField, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Button, Typography, Paper, Snackbar, Alert } from '@mui/material';
 
 const CadastroUsuario = () => {
@@ -9,8 +10,7 @@ const CadastroUsuario = () => {
   const [sobrenome, setSobrenome] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
-  const [tipoUsuario, setTipoUsuario] = useState('1'); // 1 = Usuário Comum, 2 = Funcionário
-
+  const [tipoUsuario, setTipoUsuario] = useState('1');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
@@ -30,28 +30,30 @@ const CadastroUsuario = () => {
     }
 
     const usuario = {
-      cpf: cpf.replace(/\D/g, ''),
-      cnpj: cnpj.replace(/\D/g, ''),
+      cpf: tipoPessoa === 'fisica' ? cpf.replace(/\D/g, '') : null,
+      cnpj: tipoPessoa === 'juridica' ? cnpj.replace(/\D/g, '') : null,
       nome,
-      sobrenome,
+      sobrenome: tipoPessoa === 'fisica' ? sobrenome : null,
       password: senha,
       tipoUsuario: parseInt(tipoUsuario),
     };
 
     try {
-      // Substitua pela chamada de API adequada
-      // await api.post('/usuarios', usuario);
-      setSnackbarMessage('Usuário cadastrado com sucesso!');
-      setSnackbarSeverity('success');
-      setSnackbarOpen(true);
-      setCpf('');
-      setCnpj('');
-      setNome('');
-      setSobrenome('');
-      setSenha('');
-      setConfirmarSenha('');
-      setTipoUsuario('1');
-      setTipoPessoa('fisica');
+      const response = await axios.post('/api/usuarios/register', usuario);
+
+      if (response.status === 200) {
+        setSnackbarMessage('Usuário cadastrado com sucesso!');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        setCpf('');
+        setCnpj('');
+        setNome('');
+        setSobrenome('');
+        setSenha('');
+        setConfirmarSenha('');
+        setTipoUsuario('1');
+        setTipoPessoa('fisica');
+      }
     } catch (error) {
       console.error('Erro ao cadastrar usuário:', error);
       setSnackbarMessage('Erro ao cadastrar usuário. Verifique os campos e tente novamente.');
@@ -158,6 +160,7 @@ const CadastroUsuario = () => {
             onChange={(e) => setConfirmarSenha(e.target.value)}
             required
           />
+
           <Button type="submit" variant="contained" color="primary" sx={{ marginTop: 2 }}>
             Cadastrar
           </Button>

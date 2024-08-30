@@ -37,6 +37,11 @@ function App() {
     setLoginOpen(false);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    window.location.href = '/home';
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -79,7 +84,12 @@ function App() {
             </Button>
           </Toolbar>
         </AppBar>
-        <SideMenu open={drawerOpen} onClose={handleDrawerToggle} onMenuClick={handleMenuClick} />
+        <SideMenu 
+          open={drawerOpen} 
+          onClose={handleDrawerToggle} 
+          onMenuClick={handleMenuClick} 
+          onLogout={handleLogout}
+        />
         <Container className="container" maxWidth="lg">
           <Box display="flex" flexDirection="column" alignItems="center">
             <Box width="100%">
