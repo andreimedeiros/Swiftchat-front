@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, TextField, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Button, Typography, MenuItem, Select, InputLabel, Paper, Snackbar, Alert } from '@mui/material';
+import { Container, TextField, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Button, Typography, MenuItem, Select, InputLabel, Paper, Snackbar, Alert, Input } from '@mui/material';
 import api from '../services/api';
 
 const CadastroProcesso = () => {
@@ -9,6 +9,7 @@ const CadastroProcesso = () => {
   const [tipoProcesso, setTipoProcesso] = useState('');
   const [descricao, setDescricao] = useState('');
   const [tiposProcesso, setTiposProcesso] = useState([]);
+  const [arquivo, setArquivo] = useState(null); // Novo estado para o arquivo
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -32,7 +33,7 @@ const CadastroProcesso = () => {
   };
 
   const formatarCpfCnpj = (valor) => {
-    valor = valor.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+    valor = valor.replace(/\D/g, '');
 
     if (tipoPessoa === 'física' && valor.length <= 11) {
       valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
@@ -53,20 +54,30 @@ const CadastroProcesso = () => {
     setCpf(valorFormatado);
   };
 
+  const handleArquivoChange = (event) => {
+    setArquivo(event.target.files[0]); // Armazena o arquivo selecionado
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const processo = {
-      nome,
-      usuario: nome,  // Usando o campo 'nome' para satisfazer o backend
-      tipoPessoa,
-      cpf: cpf.replace(/\D/g, ''),  // Remove a formatação antes de enviar para o backend
-      tipoProcesso: { id: tipoProcesso },
-      descricao,
-    };
+    const formData = new FormData();
+    formData.append('nome', nome);
+    formData.append('usuario', nome);
+    formData.append('tipoPessoa', tipoPessoa);
+    formData.append('cpf', cpf.replace(/\D/g, ''));
+    formData.append('tipoProcesso', JSON.stringify({ id: tipoProcesso }));
+    formData.append('descricao', descricao);
+    if (arquivo) {
+      formData.append('arquivo', arquivo); // Anexa o arquivo ao FormData
+    }
 
     try {
-      await api.post('/processos', processo);
+      await api.post('/processos', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       setSnackbarMessage('Processo criado com sucesso!');
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
@@ -75,9 +86,10 @@ const CadastroProcesso = () => {
       setCpf('');
       setTipoProcesso('');
       setDescricao('');
+      setArquivo(null); // Limpa o estado do arquivo
     } catch (error) {
       console.error('Erro ao criar processo:', error);
-      setSnackbarMessage('CPF/CNPJ já utilizado em um processo. Aguarde a conclusão do mesmo.');
+      setSnackbarMessage('Erro ao criar processo. Verifique os campos e tente novamente.');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
@@ -148,6 +160,16 @@ const CadastroProcesso = () => {
             onChange={(e) => setDescricao(e.target.value)}
             required
           />
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel shrink={true} sx={{ color: 'blue' }}>Anexar Documento</InputLabel>
+            <Input
+              id="arquivo"
+              type="file"
+              inputProps={{ accept: 'application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document' }}
+              onChange={handleArquivoChange}
+            />
+          </FormControl>
 
           <Button type="submit" variant="contained" color="primary" sx={{ marginTop: 2 }}>
             Enviar
