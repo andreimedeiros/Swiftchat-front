@@ -13,7 +13,8 @@ import ListaSetores from './components/ListaSetores';
 import MovimentarProcesso from './components/MovimentarProcesso';
 import Home from './components/Home';
 import SideMenu from './components/SideMenu';
-import Login from './components/Login';  // Importe o componente de login
+import Login from './components/Login'; 
+import CadastroUsuario from './components/CadastroUsuario'; // Importe o componente de cadastro de usuário
 
 function App() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -90,6 +91,7 @@ function App() {
                 <Route path="/tiposProcessos" element={<ListaTiposProcessos />} />
                 <Route path="/setores" element={<ListaSetores />} />
                 <Route path="/movimentar" element={<MovimentarProcesso />} />
+                <Route path="/cadastrarUsuario" element={<CadastroUsuario />} />
               </Routes>
             </Box>
           </Box>
