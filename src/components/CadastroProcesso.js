@@ -162,7 +162,7 @@ const CadastroProcesso = () => {
           />
 
           <FormControl fullWidth margin="normal">
-            <InputLabel shrink={true} sx={{ color: 'blue' }}>Anexar Documento</InputLabel>
+            <InputLabel shrink={true}>Anexar Documento</InputLabel>
             <Input
               id="arquivo"
               type="file"
