@@ -1,15 +1,35 @@
-// Login.js
 import React, { useState } from 'react';
 import { Box, Button, TextField, Typography, Paper } from '@mui/material';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Login = ({ onClose }) => {
-  const [username, setUsername] = useState('');
+  const [cpfCnpj, setCpfCnpj] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // Aqui você pode implementar a lógica de autenticação
-    alert(`Username: ${username}, Password: ${password}`);
-    onClose(); // Fechar o modal de login após o login
+  const handleLogin = async () => {
+    try {
+      const cleanCpfCnpj = cpfCnpj.replace(/\D/g, '');
+      const response = await axios.post('http://localhost:8080/api/auth/login', {
+        cpfCnpj: cleanCpfCnpj,
+        password,
+      });
+
+      const { token, userType, userName } = response.data; // Verifique se `userName` está correto
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('userType', userType);
+      localStorage.setItem('userName', userName); // Certifique-se de que `userName` está realmente sendo passado na resposta
+
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+      navigate('/welcome'); // Redireciona para a tela de boas-vindas
+      onClose();
+    } catch (error) {
+      console.error('Erro ao fazer login:', error.response || error);
+      alert('Erro ao fazer login. Por favor, tente novamente.');
+    }
   };
 
   return (
@@ -19,15 +39,15 @@ const Login = ({ onClose }) => {
       </Typography>
       <Box display="flex" flexDirection="column" alignItems="center">
         <TextField
-          label="Username"
+          label="CPF/CNPJ"
           variant="outlined"
           fullWidth
           margin="normal"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={cpfCnpj}
+          onChange={(e) => setCpfCnpj(e.target.value)}
         />
         <TextField
-          label="Password"
+          label="Senha"
           type="password"
           variant="outlined"
           fullWidth

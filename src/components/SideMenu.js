@@ -14,7 +14,7 @@ const SideMenu = ({ open, onClose, onMenuClick }) => {
       open={open}
       onClose={onClose}
       PaperProps={{
-        style: { width: 240, backgroundColor: '#1976d2', color: '#ffffff' }, // Cor de fundo e do texto
+        style: { width: 240, backgroundColor: '#008F6D', color: '#ffffff' }, // Cor de fundo e do texto
       }}
     >
       <List>
@@ -24,35 +24,35 @@ const SideMenu = ({ open, onClose, onMenuClick }) => {
           </ListItemIcon>
           <ListItemText primary="Tela Inicial" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
         </ListItem>
-        <Divider style={{ backgroundColor: '#2196f3' }} />
+        <Divider style={{ backgroundColor: '#008F6D' }} />
         <ListItem button onClick={() => onMenuClick('list')} style={{ justifyContent: 'center' }}>
           <ListItemIcon>
             <ViewListIcon style={{ color: '#ffffff' }} />
           </ListItemIcon>
           <ListItemText primary="Ver Processos" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
         </ListItem>
-        <Divider style={{ backgroundColor: '#2196f3' }} />
+        <Divider style={{ backgroundColor: '#008F6D' }} />
         <ListItem button onClick={() => onMenuClick('add')} style={{ justifyContent: 'center' }}>
           <ListItemIcon>
             <AddIcon style={{ color: '#ffffff' }} />
           </ListItemIcon>
           <ListItemText primary="Cadastrar Processo" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
         </ListItem>
-        <Divider style={{ backgroundColor: '#2196f3' }} />
+        <Divider style={{ backgroundColor: '#008F6D' }} />
         <ListItem button onClick={() => onMenuClick('tiposProcessos')} style={{ justifyContent: 'center' }}>
           <ListItemIcon>
             <CategoryIcon style={{ color: '#ffffff' }} />
           </ListItemIcon>
           <ListItemText primary="Tipos de Processos" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
         </ListItem>
-        <Divider style={{ backgroundColor: '#2196f3' }} />
+        <Divider style={{ backgroundColor: '#008F6D' }} />
         <ListItem button onClick={() => onMenuClick('setores')} style={{ justifyContent: 'center' }}>
           <ListItemIcon>
             <BusinessIcon style={{ color: '#ffffff' }} />
           </ListItemIcon>
           <ListItemText primary="Setores" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
         </ListItem>
-        <Divider style={{ backgroundColor: '#2196f3' }} />
+        <Divider style={{ backgroundColor: '#008F6D' }} />
         <ListItem button onClick={() => onMenuClick('movimentar')} style={{ justifyContent: 'center' }}>
           <ListItemIcon>
             <SwapHorizIcon style={{ color: '#ffffff' }} />
