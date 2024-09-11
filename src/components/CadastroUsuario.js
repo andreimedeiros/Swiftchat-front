@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+// Remova esta linha, pois não precisa mais importar o axios diretamente
+// import axios from 'axios';
+import api from '../services/api';
 import { Container, TextField, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Button, Typography, Paper, Snackbar, Alert } from '@mui/material';
 
 const CadastroUsuario = () => {
@@ -39,7 +41,8 @@ const CadastroUsuario = () => {
     };
 
     try {
-      const response = await axios.post('/api/usuarios/register', usuario);
+      // Aqui utilizamos a instância personalizada de Axios
+      const response = await api.post('/usuarios/register', usuario);
 
       if (response.status === 200) {
         setSnackbarMessage('Usuário cadastrado com sucesso!');

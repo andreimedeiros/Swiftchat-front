@@ -38,7 +38,6 @@ function App() {
     setLoginOpen(false);
   };
 
- 
 
   const handleLogout = () => {
     localStorage.removeItem('token');
