@@ -1,7 +1,19 @@
 import axios from 'axios';
 
+// Criar uma instância de Axios
 const api = axios.create({
-  baseURL: 'http://localhost:8080', // Certifique-se que o backend está rodando nessa porta
+  baseURL: 'http://localhost:8080/api',
+});
+
+// Adicionar um interceptador para incluir o token em todas as requisições
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
 });
 
 export default api;

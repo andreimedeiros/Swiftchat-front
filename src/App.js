@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import axios from 'axios';
 import { Container, Typography, AppBar, Toolbar, IconButton, Box, Button, Modal } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { ThemeProvider } from '@mui/material/styles';
@@ -37,8 +38,13 @@ function App() {
     setLoginOpen(false);
   };
 
+ 
+
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('token');
+    localStorage.removeItem('userType');
+    localStorage.removeItem('userName');
+    delete axios.defaults.headers.common['Authorization'];
     window.location.href = '/home';
   };
 
@@ -102,6 +108,7 @@ function App() {
                 <Route path="/setores" element={<ListaSetores />} />
                 <Route path="/movimentar" element={<MovimentarProcesso />} />
                 <Route path="/cadastrarUsuario" element={<CadastroUsuario />} />
+                <Route path="/welcome" element={<Welcome />} /> {/* Adicione a rota de boas-vindas */}
               </Routes>
             </Box>
           </Box>
@@ -142,5 +149,16 @@ function App() {
     </ThemeProvider>
   );
 }
+
+// Componente de Boas-Vindas (Welcome.js)
+const Welcome = () => {
+  const userName = localStorage.getItem('userName') || 'Usuário';
+  return (
+    <Box>
+      <Typography variant="h5">Bem-vindo, {userName}!</Typography>
+      {/* Outras informações ou redirecionamentos */}
+    </Box>
+  );
+};
 
 export default App;

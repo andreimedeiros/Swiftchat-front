@@ -16,7 +16,7 @@ const SideMenu = ({ open, onClose, onMenuClick, onLogout }) => {
       open={open}
       onClose={onClose}
       PaperProps={{
-        style: { width: 240, backgroundColor: '#1976d2', color: '#ffffff' },
+        style: { width: 240, backgroundColor: '#008F6D', color: '#ffffff' },
       }}
     >
       <List>
@@ -26,56 +26,56 @@ const SideMenu = ({ open, onClose, onMenuClick, onLogout }) => {
           </ListItemIcon>
           <ListItemText primary="Tela Inicial" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
         </ListItem>
-        <Divider style={{ backgroundColor: '#2196f3' }} />
+        <Divider style={{ backgroundColor: '#008F6D' }} />
         <ListItem button onClick={() => onMenuClick('cadastrarUsuario')} style={{ justifyContent: 'center' }}>
           <ListItemIcon>
             <PersonAddIcon style={{ color: '#ffffff' }} />
           </ListItemIcon>
           <ListItemText primary="Cadastrar Usuário" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
         </ListItem>
-        <Divider style={{ backgroundColor: '#2196f3' }} />
+        <Divider style={{ backgroundColor: '#008F6D' }} />
         <ListItem button onClick={() => onMenuClick('list')} style={{ justifyContent: 'center' }}>
           <ListItemIcon>
             <ViewListIcon style={{ color: '#ffffff' }} />
           </ListItemIcon>
           <ListItemText primary="Ver Processos" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
         </ListItem>
-        <Divider style={{ backgroundColor: '#2196f3' }} />
+        <Divider style={{ backgroundColor: '#008F6D' }} />
         <ListItem button onClick={() => onMenuClick('add')} style={{ justifyContent: 'center' }}>
           <ListItemIcon>
             <AddIcon style={{ color: '#ffffff' }} />
           </ListItemIcon>
           <ListItemText primary="Cadastrar Processo" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
         </ListItem>
-        <Divider style={{ backgroundColor: '#2196f3' }} />
+        <Divider style={{ backgroundColor: '#008F6D' }} />
         <ListItem button onClick={() => onMenuClick('tiposProcessos')} style={{ justifyContent: 'center' }}>
           <ListItemIcon>
             <CategoryIcon style={{ color: '#ffffff' }} />
           </ListItemIcon>
           <ListItemText primary="Tipos de Processos" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
         </ListItem>
-        <Divider style={{ backgroundColor: '#2196f3' }} />
+        <Divider style={{ backgroundColor: '#008F6D' }} />
         <ListItem button onClick={() => onMenuClick('setores')} style={{ justifyContent: 'center' }}>
           <ListItemIcon>
             <BusinessIcon style={{ color: '#ffffff' }} />
           </ListItemIcon>
           <ListItemText primary="Setores" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
         </ListItem>
-        <Divider style={{ backgroundColor: '#2196f3' }} />
+        <Divider style={{ backgroundColor: '#008F6D' }} />
         <ListItem button onClick={() => onMenuClick('movimentar')} style={{ justifyContent: 'center' }}>
           <ListItemIcon>
             <SwapHorizIcon style={{ color: '#ffffff' }} />
           </ListItemIcon>
           <ListItemText primary="Movimentar Processo" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
         </ListItem>
-        <Divider style={{ backgroundColor: '#2196f3' }} />
+        <Divider style={{ backgroundColor: '#008F6D' }} />
         <ListItem button onClick={onLogout} style={{ justifyContent: 'center' }}>
           <ListItemIcon>
             <ExitToAppIcon style={{ color: '#ffffff' }} />
           </ListItemIcon>
           <ListItemText primary="Logout" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
         </ListItem>
-        <Divider style={{ backgroundColor: '#2196f3' }} />
+        <Divider style={{ backgroundColor: '#008F6D' }} />
       </List>
     </Drawer>
   );
