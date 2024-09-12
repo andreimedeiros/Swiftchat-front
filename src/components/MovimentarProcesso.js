@@ -38,6 +38,10 @@ const MovimentarProcesso = () => {
   const handleMovimentar = async () => {
     try {
       await api.put(`/processos/${processoSelecionado}/setor/${setorDestino}`);
+      
+      // Atualiza a lista de processos após a movimentação
+      fetchProcessos();
+
       setSnackbarMessage('Processo movimentado com sucesso!');
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
