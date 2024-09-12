@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Paper } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+// import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
 import api from '../services/api';
@@ -29,9 +29,9 @@ const ListaProcessos = () => {
     }
   };
 
-  const handleEdit = (id) => {
-    console.log('Editar processo com ID:', id);
-  };
+  // const handleEdit = (id) => {
+  //   console.log('Editar processo com ID:', id);
+  // };
 
   const handleDelete = async (id) => {
     try {
@@ -107,7 +107,7 @@ const ListaProcessos = () => {
                   <TableCell>{processo.tipoProcesso ? processo.tipoProcesso.nome : ''}</TableCell>
                   <TableCell>{processo.descricao}</TableCell>
                   <TableCell>
-                    <Button
+                    {/* <Button
                       variant="outlined"
                       color="primary"
                       startIcon={<EditIcon />}
@@ -115,7 +115,7 @@ const ListaProcessos = () => {
                       style={{ marginRight: 8 }}
                     >
                       Editar
-                    </Button>
+                    </Button> */}
                     <Button
                       variant="outlined"
                       color="error"

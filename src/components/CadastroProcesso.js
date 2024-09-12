@@ -26,7 +26,20 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
   }, []);
 
   const handleArquivoChange = (event) => {
-    setArquivo(event.target.files[0]);
+    const file = event.target.files[0];
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+    if (file.size > MAX_FILE_SIZE) {
+      alert('O arquivo excede o tamanho máximo de 5 MB.');
+      return;
+    }
+
+    if (file.type !== 'application/pdf') {
+      alert('Apenas arquivos PDF são permitidos.');
+      return;
+    }
+
+    setArquivo(file);
   };
 
   const handleCadastro = async () => {
@@ -38,7 +51,6 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
           descricao,
           tipoProcesso: { id: tipoProcesso },
         })], { type: 'application/json' }));
-        
         
         if (arquivo) {
           formData.append('arquivo', arquivo);
@@ -78,8 +90,6 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
       setSnackbarOpen(true);
     }
   };
-  
-  
 
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
@@ -127,7 +137,7 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
           <input
             id="arquivo"
             type="file"
-            accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            accept="application/pdf"
             onChange={handleArquivoChange}
           />
         </FormControl>
@@ -142,7 +152,7 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'center', horizontal: 'center' }}
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} x={{ width: '100%' }}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>
