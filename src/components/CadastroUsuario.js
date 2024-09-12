@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-// Remova esta linha, pois não precisa mais importar o axios diretamente
-// import axios from 'axios';
 import api from '../services/api';
 import { Container, TextField, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Button, Typography, Paper, Snackbar, Alert } from '@mui/material';
 
@@ -36,18 +34,20 @@ const CadastroUsuario = () => {
       cnpj: tipoPessoa === 'juridica' ? cnpj.replace(/\D/g, '') : null,
       nome,
       sobrenome: tipoPessoa === 'fisica' ? sobrenome : null,
+      razaoSocial: tipoPessoa === 'juridica' ? nome : null, // nome da empresa para pessoa jurídica
       password: senha,
       tipoUsuario: parseInt(tipoUsuario),
     };
 
     try {
-      // Aqui utilizamos a instância personalizada de Axios
       const response = await api.post('/usuarios/register', usuario);
 
       if (response.status === 200) {
         setSnackbarMessage('Usuário cadastrado com sucesso!');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
+
+        // Limpa os campos após o cadastro
         setCpf('');
         setCnpj('');
         setNome('');
@@ -121,7 +121,7 @@ const CadastroUsuario = () => {
           {tipoPessoa === 'juridica' && (
             <>
               <TextField
-                label="Nome da Empresa"
+                label="Nome da Empresa (Razão Social)"
                 variant="outlined"
                 fullWidth
                 margin="normal"
