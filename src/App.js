@@ -7,10 +7,10 @@ import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme'; 
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import './App.css'; 
-import CadastroProcesso from './components/CadastroProcesso'; // Certifique-se de que o caminho está correto
+// import CadastroProcesso from './components/CadastroProcesso';
 import ListaProcessos from './components/ListaProcessos';
-import ListaTiposProcessos from './components/ListaTiposProcessos';
-import ListaSetores from './components/ListaSetores';
+// import ListaTiposProcessos from './components/ListaTiposProcessos';
+// import ListaSetores from './components/ListaSetores';
 import MovimentarProcesso from './components/MovimentarProcesso';
 import Home from './components/Home';
 import SideMenu from './components/SideMenu';
@@ -46,6 +46,20 @@ function App() {
     delete axios.defaults.headers.common['Authorization'];
     window.location.href = '/home';
   };
+
+  useEffect(() => {
+    // Adiciona o evento para limpar o localStorage ao fechar ou recarregar a janela
+    const handleWindowClose = () => {
+      handleLogout(); // Chama o logout para limpar os dados ao fechar/recarregar
+    };
+
+    window.addEventListener('beforeunload', handleWindowClose);
+
+    // Remove o event listener quando o componente é desmontado
+    return () => {
+      window.removeEventListener('beforeunload', handleWindowClose);
+    };
+  }, []);
 
   const isLoggedIn = !!localStorage.getItem('token'); // Verifica se o usuário está logado
   const userType = localStorage.getItem('userType'); // Pega o tipo de usuário
@@ -111,7 +125,6 @@ function App() {
                 {isLoggedIn && userType === 'USUARIO' && (
                   <>
                     <Route path="/list" element={<ListaProcessos />} />
-                    <Route path="/add" element={<CadastroProcesso />} /> {/* Adiciona a rota de cadastro de processo */}
                   </>
                 )}
                 {isLoggedIn && userType === 'FUNCIONARIO' && (

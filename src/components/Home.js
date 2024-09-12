@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Container, Typography, Box, Button, Modal, Paper } from '@mui/material';
+import { Container, Typography, Box, Modal, Paper } from '@mui/material';
 import Login from './Login';
 
 const Home = () => {
   const [loginOpen, setLoginOpen] = useState(false);
   const userName = localStorage.getItem('userName'); // Verifica se há um usuário logado
 
-  const handleLoginOpen = () => {
-    setLoginOpen(true);
-  };
+  // const handleLoginOpen = () => {
+  //   setLoginOpen(true);
+  // };
 
   const handleLoginClose = () => {
     setLoginOpen(false);
@@ -43,7 +43,7 @@ const Home = () => {
         sx={{ height: '100%', textAlign: 'center', padding: 2 }}
       >
         <Typography variant="h3" color="primary" gutterBottom>
-          {userName ? `Bem-vindo ao SwiftChat, ${userName}!` : 'Bem-vindo ao SwiftChat'}
+          {userName ? `Bem-vindo(a) ao SwiftChat, ${userName}!` : 'Bem-vindo(a) ao SwiftChat'}
         </Typography>
         <Typography variant="h6" color="textSecondary" align="center">
           Uma plataforma de gestão eficiente para seus processos.
