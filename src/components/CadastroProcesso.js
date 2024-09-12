@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Typography, Paper, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import axios from 'axios';
+import api from '../services/api';
 
 const CadastroProcesso = ({ onSubmit }) => {
   const [tiposProcesso, setTiposProcesso] = useState([]);
   const [tipoProcesso, setTipoProcesso] = useState('');
+  const [nome, setNome] = useState(''); 
   const [descricao, setDescricao] = useState('');
   const [arquivo, setArquivo] = useState(null);
 
-  // Função para buscar os tipos de processo do backend
   useEffect(() => {
     const fetchTiposProcesso = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/tiposProcesso');  // Supondo que exista um endpoint para buscar os tipos de processo
+        const response = await api.get('/tiposprocessos');
         setTiposProcesso(response.data);
       } catch (error) {
         console.error('Erro ao buscar tipos de processo:', error);
@@ -27,25 +27,28 @@ const CadastroProcesso = ({ onSubmit }) => {
   };
 
   const handleCadastro = async () => {
-    if (tipoProcesso && descricao && arquivo) {
+    if (nome && tipoProcesso && descricao) {
       try {
-        
-        const formData = new FormData();
-        formData.append('tipoProcesso', tipoProcesso);  // Adiciona o id do tipo de processo
-        formData.append('descricao', descricao);  // Adiciona a descrição
-        formData.append('arquivo', arquivo);  // Adiciona o arquivo selecionado
+        // Preparar os dados para enviar como JSON
+        const processData = {
+          nome,
+          descricao,
+          tipoProcesso: {
+            id: tipoProcesso,
+          },
+        };
 
-        // Submetendo o processo para o backend
-        const response = await axios.post('http://localhost:8080/api/processos', formData, {
+        const response = await api.post('/processos', processData, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,  // Supondo que o token JWT está sendo armazenado no localStorage
-            'Content-Type': 'multipart/form-data',  // Necessário ao enviar arquivos
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
           },
         });
 
         if (response.status === 200) {
           alert('Processo cadastrado com sucesso!');
-          onSubmit(response.data); // Caso haja necessidade de alguma ação após o cadastro
+         
+          
         }
       } catch (error) {
         console.error('Erro ao cadastrar processo:', error);
@@ -62,6 +65,14 @@ const CadastroProcesso = ({ onSubmit }) => {
         Cadastro de Processo
       </Typography>
       <Box display="flex" flexDirection="column" alignItems="center">
+        <TextField
+          label="Nome do Processo"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={nome}
+          onChange={(e) => setNome(e.target.value)}
+        />
         <FormControl fullWidth margin="normal">
           <InputLabel id="tipo-processo-label">Tipo de Processo</InputLabel>
           <Select
@@ -84,7 +95,6 @@ const CadastroProcesso = ({ onSubmit }) => {
           value={descricao}
           onChange={(e) => setDescricao(e.target.value)}
         />
-
         <FormControl fullWidth margin="normal">
           Anexar Documento
           <InputLabel shrink={true}></InputLabel>
@@ -95,7 +105,6 @@ const CadastroProcesso = ({ onSubmit }) => {
             onChange={handleArquivoChange}
           />
         </FormControl>
-
         <Button variant="contained" color="primary" onClick={handleCadastro} sx={{ marginTop: 2 }}>
           Cadastrar Processo
         </Button>
