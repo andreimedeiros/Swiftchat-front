@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, Typography, Paper, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Box, Button, TextField, Typography, Paper, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert } from '@mui/material';
 import api from '../services/api';
 
-const CadastroProcesso = ({ onSubmit }) => {
+const CadastroProcesso = ({ onSubmit = () => {} }) => {
   const [tiposProcesso, setTiposProcesso] = useState([]);
   const [tipoProcesso, setTipoProcesso] = useState('');
   const [nome, setNome] = useState(''); 
   const [descricao, setDescricao] = useState('');
   const [arquivo, setArquivo] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
 
   useEffect(() => {
     const fetchTiposProcesso = async () => {
@@ -29,7 +32,6 @@ const CadastroProcesso = ({ onSubmit }) => {
   const handleCadastro = async () => {
     if (nome && tipoProcesso && descricao) {
       try {
-        // Preparar os dados para enviar como JSON
         const processData = {
           nome,
           descricao,
@@ -46,17 +48,28 @@ const CadastroProcesso = ({ onSubmit }) => {
         });
 
         if (response.status === 200) {
-          alert('Processo cadastrado com sucesso!');
-         
-          
+          setSnackbarMessage('Processo cadastrado com sucesso!');
+          setSnackbarSeverity('success');
+          setSnackbarOpen(true);
+          if (typeof onSubmit === 'function') {
+            onSubmit(response.data);
+          }
         }
       } catch (error) {
         console.error('Erro ao cadastrar processo:', error);
-        alert('Erro ao cadastrar processo. Por favor, tente novamente.');
+        setSnackbarMessage('Erro ao cadastrar processo. Por favor, tente novamente.');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
       }
     } else {
-      alert('Por favor, preencha todos os campos e anexe o arquivo.');
+      setSnackbarMessage('Por favor, preencha todos os campos e anexe o arquivo.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
   };
 
   return (
@@ -109,6 +122,17 @@ const CadastroProcesso = ({ onSubmit }) => {
           Cadastrar Processo
         </Button>
       </Box>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'center', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} x={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Paper>
   );
 };
