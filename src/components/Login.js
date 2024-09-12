@@ -24,7 +24,7 @@ const Login = ({ onClose }) => {
 
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-      navigate('/welcome'); // Redireciona para a tela de boas-vindas
+      navigate('/home'); // Redireciona para a tela de boas-vindas
       onClose();
       console.log(response)
     } catch (error) {

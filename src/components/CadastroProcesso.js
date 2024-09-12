@@ -48,9 +48,16 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
         });
 
         if (response.status === 200) {
+          // Limpa os campos após o cadastro
+          setNome('');
+          setDescricao('');
+          setTipoProcesso('');
+          setArquivo(null);
+
           setSnackbarMessage('Processo cadastrado com sucesso!');
           setSnackbarSeverity('success');
           setSnackbarOpen(true);
+
           if (typeof onSubmit === 'function') {
             onSubmit(response.data);
           }
@@ -62,7 +69,7 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
         setSnackbarOpen(true);
       }
     } else {
-      setSnackbarMessage('Por favor, preencha todos os campos e anexe o arquivo.');
+      setSnackbarMessage('Por favor, preencha todos os campos.');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }

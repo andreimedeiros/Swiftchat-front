@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Container, Typography, AppBar, Toolbar, IconButton, Box, Button, Modal } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -7,37 +7,37 @@ import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme'; 
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import './App.css'; 
-import CadastroProcesso from './components/CadastroProcesso';
+import CadastroProcesso from './components/CadastroProcesso'; // Certifique-se de que o caminho está correto
 import ListaProcessos from './components/ListaProcessos';
 import ListaTiposProcessos from './components/ListaTiposProcessos';
 import ListaSetores from './components/ListaSetores';
 import MovimentarProcesso from './components/MovimentarProcesso';
 import Home from './components/Home';
 import SideMenu from './components/SideMenu';
-import Login from './components/Login'; 
-import CadastroUsuario from './components/CadastroUsuario'; // Importe o componente de cadastro de usuário
+import Login from './components/Login';
+import CadastroUsuario from './components/CadastroUsuario';
 
 function App() {
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const [loginOpen, setLoginOpen] = React.useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false); // Controle do SideMenu
+  const [loginOpen, setLoginOpen] = useState(false); // Controle do modal de login
 
+  // Função para abrir/fechar o SideMenu
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
   };
 
   const handleMenuClick = (viewName) => {
-    setDrawerOpen(false);
-    window.location.href = `/${viewName}`;
+    setDrawerOpen(false); // Fecha o SideMenu após clicar em um item
+    window.location.href = `/${viewName}`; // Redireciona para a rota clicada
   };
 
   const handleLoginOpen = () => {
-    setLoginOpen(true);
+    setLoginOpen(true); // Abre o modal de login
   };
 
   const handleLoginClose = () => {
-    setLoginOpen(false);
+    setLoginOpen(false); // Fecha o modal de login
   };
-
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -46,6 +46,9 @@ function App() {
     delete axios.defaults.headers.common['Authorization'];
     window.location.href = '/home';
   };
+
+  const isLoggedIn = !!localStorage.getItem('token'); // Verifica se o usuário está logado
+  const userType = localStorage.getItem('userType'); // Pega o tipo de usuário
 
   return (
     <ThemeProvider theme={theme}>
@@ -73,22 +76,25 @@ function App() {
               }}>
               {window.location.pathname === '/' || window.location.pathname === '/home' ? 'SwiftChat' : 'Gestão de Processos'}
             </Typography>
-            <Button 
-              variant="outlined" 
-              color="inherit" 
-              onClick={handleLoginOpen} 
-              sx={{
-                borderColor: 'white',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                },
-              }}
-            >
-              Login
-            </Button>
+            {!isLoggedIn && ( // Exibe o botão de login apenas se não estiver logado
+              <Button 
+                variant="outlined" 
+                color="inherit" 
+                onClick={handleLoginOpen} 
+                sx={{
+                  borderColor: 'white',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
+              >
+                Login
+              </Button>
+            )}
           </Toolbar>
         </AppBar>
+        {/* Menu lateral */}
         <SideMenu 
           open={drawerOpen} 
           onClose={handleDrawerToggle} 
@@ -101,13 +107,20 @@ function App() {
               <Routes>
                 <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/home" element={<Home />} />
-                <Route path="/list" element={<ListaProcessos />} />
-                <Route path="/add" element={<CadastroProcesso />} />
-                <Route path="/tiposProcessos" element={<ListaTiposProcessos />} />
-                <Route path="/setores" element={<ListaSetores />} />
-                <Route path="/movimentar" element={<MovimentarProcesso />} />
+                {/* Exibe as rotas apenas se estiver logado */}
+                {isLoggedIn && userType === 'USUARIO' && (
+                  <>
+                    <Route path="/list" element={<ListaProcessos />} />
+                    <Route path="/add" element={<CadastroProcesso />} /> {/* Adiciona a rota de cadastro de processo */}
+                  </>
+                )}
+                {isLoggedIn && userType === 'FUNCIONARIO' && (
+                  <>
+                    <Route path="/list" element={<ListaProcessos />} />
+                    <Route path="/movimentar" element={<MovimentarProcesso />} />
+                  </>
+                )}
                 <Route path="/cadastrarUsuario" element={<CadastroUsuario />} />
-                <Route path="/welcome" element={<Welcome />} /> {/* Adicione a rota de boas-vindas */}
               </Routes>
             </Box>
           </Box>
@@ -148,16 +161,5 @@ function App() {
     </ThemeProvider>
   );
 }
-
-// Componente de Boas-Vindas (Welcome.js)
-const Welcome = () => {
-  const userName = localStorage.getItem('userName') || 'Usuário';
-  return (
-    <Box>
-      <Typography variant="h5">Bem-vindo, {userName}!</Typography>
-      {/* Outras informações ou redirecionamentos */}
-    </Box>
-  );
-};
 
 export default App;
