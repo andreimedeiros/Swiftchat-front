@@ -8,6 +8,7 @@ const CadastroUsuario = () => {
   const [cnpj, setCnpj] = useState('');
   const [nome, setNome] = useState('');
   const [sobrenome, setSobrenome] = useState('');
+  const [razaoSocial, setRazaoSocial] = useState('');  // Novo campo para Razão Social
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
   const [tipoUsuario, setTipoUsuario] = useState('1');
@@ -34,7 +35,7 @@ const CadastroUsuario = () => {
       cnpj: tipoPessoa === 'juridica' ? cnpj.replace(/\D/g, '') : null,
       nome,
       sobrenome: tipoPessoa === 'fisica' ? sobrenome : null,
-      razaoSocial: tipoPessoa === 'juridica' ? nome : null, // nome da empresa para pessoa jurídica
+      razaoSocial: tipoPessoa === 'juridica' ? razaoSocial : null,  // Enviar razão social para pessoa jurídica
       password: senha,
       tipoUsuario: parseInt(tipoUsuario),
     };
@@ -46,12 +47,11 @@ const CadastroUsuario = () => {
         setSnackbarMessage('Usuário cadastrado com sucesso!');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
-
-        // Limpa os campos após o cadastro
         setCpf('');
         setCnpj('');
         setNome('');
         setSobrenome('');
+        setRazaoSocial('');  // Limpar o campo de razão social
         setSenha('');
         setConfirmarSenha('');
         setTipoUsuario('1');
@@ -121,12 +121,22 @@ const CadastroUsuario = () => {
           {tipoPessoa === 'juridica' && (
             <>
               <TextField
-                label="Nome da Empresa (Razão Social)"
+                label="Nome da Empresa"
                 variant="outlined"
                 fullWidth
                 margin="normal"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
+                required
+              />
+
+              <TextField
+                label="Razão Social"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={razaoSocial}
+                onChange={(e) => setRazaoSocial(e.target.value)}
                 required
               />
 
