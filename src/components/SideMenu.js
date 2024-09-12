@@ -1,13 +1,16 @@
 import React from 'react';
-import { List, ListItem, ListItemText, ListItemIcon, Drawer, Divider, Button } from '@mui/material';
+import { List, ListItem, ListItemText, ListItemIcon, Drawer, Divider } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import AddIcon from '@mui/icons-material/Add';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import PersonAddIcon from '@mui/icons-material/PersonAdd'; 
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'; 
+import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 
-const SideMenu = ({ open, onClose, onMenuClick, onLogout }) => {
+const SideMenu = ({ open, onClose, onLogout }) => {
+  const navigate = useNavigate();  // Use useNavigate para navegação
+
   const userType = localStorage.getItem('userType'); // Pegue o tipo de usuário no localStorage
 
   return (
@@ -20,7 +23,7 @@ const SideMenu = ({ open, onClose, onMenuClick, onLogout }) => {
       }}
     >
       <List>
-        <ListItem button onClick={() => onMenuClick('home')} style={{ justifyContent: 'center' }}>
+        <ListItem button onClick={() => navigate('/home')} style={{ justifyContent: 'center' }}>
           <ListItemIcon>
             <HomeIcon style={{ color: '#ffffff' }} />
           </ListItemIcon>
@@ -28,10 +31,9 @@ const SideMenu = ({ open, onClose, onMenuClick, onLogout }) => {
         </ListItem>
         <Divider style={{ backgroundColor: '#008F6D' }} />
 
-        {/* Exibe "Cadastrar Usuário" apenas quando ninguém estiver logado */}
         {!userType && (
           <>
-            <ListItem button onClick={() => onMenuClick('cadastrarUsuario')} style={{ justifyContent: 'center' }}>
+            <ListItem button onClick={() => navigate('/cadastrarUsuario')} style={{ justifyContent: 'center' }}>
               <ListItemIcon>
                 <PersonAddIcon style={{ color: '#ffffff' }} />
               </ListItemIcon>
@@ -41,17 +43,16 @@ const SideMenu = ({ open, onClose, onMenuClick, onLogout }) => {
           </>
         )}
 
-        {/* Exibe botões para USUARIO */}
         {userType === 'USUARIO' && (
           <>
-            <ListItem button onClick={() => onMenuClick('list')} style={{ justifyContent: 'center' }}>
+            <ListItem button onClick={() => navigate('/list')} style={{ justifyContent: 'center' }}>
               <ListItemIcon>
                 <ViewListIcon style={{ color: '#ffffff' }} />
               </ListItemIcon>
               <ListItemText primary="Listar Processos" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
             </ListItem>
             <Divider style={{ backgroundColor: '#008F6D' }} />
-            <ListItem button onClick={() => onMenuClick('add')} style={{ justifyContent: 'center' }}>
+            <ListItem button onClick={() => navigate('/add')} style={{ justifyContent: 'center' }}>
               <ListItemIcon>
                 <AddIcon style={{ color: '#ffffff' }} />
               </ListItemIcon>
@@ -61,17 +62,16 @@ const SideMenu = ({ open, onClose, onMenuClick, onLogout }) => {
           </>
         )}
 
-        {/* Exibe botões para FUNCIONARIO */}
         {userType === 'FUNCIONARIO' && (
           <>
-            <ListItem button onClick={() => onMenuClick('list')} style={{ justifyContent: 'center' }}>
+            <ListItem button onClick={() => navigate('/list')} style={{ justifyContent: 'center' }}>
               <ListItemIcon>
                 <ViewListIcon style={{ color: '#ffffff' }} />
               </ListItemIcon>
               <ListItemText primary="Listar Processos" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
             </ListItem>
             <Divider style={{ backgroundColor: '#008F6D' }} />
-            <ListItem button onClick={() => onMenuClick('movimentar')} style={{ justifyContent: 'center' }}>
+            <ListItem button onClick={() => navigate('/movimentar')} style={{ justifyContent: 'center' }}>
               <ListItemIcon>
                 <SwapHorizIcon style={{ color: '#ffffff' }} />
               </ListItemIcon>
@@ -81,7 +81,6 @@ const SideMenu = ({ open, onClose, onMenuClick, onLogout }) => {
           </>
         )}
 
-        {/* Exibe o botão de logout apenas quando logado */}
         {userType && (
           <>
             <ListItem button onClick={onLogout} style={{ justifyContent: 'center' }}>
