@@ -4,20 +4,46 @@ import { Container, TextField, FormControl, FormControlLabel, FormLabel, Radio, 
 
 const CadastroUsuario = () => {
   const [tipoPessoa, setTipoPessoa] = useState('fisica');
-  const [cpf, setCpf] = useState('');
-  const [cnpj, setCnpj] = useState('');
+  const [cpfCnpj, setCpfCnpj] = useState('');
   const [nome, setNome] = useState('');
   const [sobrenome, setSobrenome] = useState('');
-  const [razaoSocial, setRazaoSocial] = useState('');  // Novo campo para Razão Social
+  const [razaoSocial, setRazaoSocial] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
-  const [tipoUsuario, setTipoUsuario] = useState('1');
+  const [tipoUsuario, setTipoUsuario] = useState('1'); // Usuário comum por padrão
+  const [matricula, setMatricula] = useState(''); // Adicionar matrícula se for funcionário
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
+  };
+
+  const limparFormato = (valor) => valor.replace(/\D/g, '');
+
+  const formatarCpfCnpj = (valor) => {
+    valor = limparFormato(valor);
+
+    if (tipoPessoa === 'fisica') {
+      if (valor.length <= 11) {
+        valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+        valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+        valor = valor.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      }
+    } else if (tipoPessoa === 'juridica') {
+      if (valor.length <= 14) {
+        valor = valor.replace(/^(\d{2})(\d)/, '$1.$2');
+        valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+        valor = valor.replace(/\.(\d{3})(\d)/, '.$1/$2');
+        valor = valor.replace(/(\d{4})(\d)/, '$1-$2');
+      }
+    }
+    return valor;
+  };
+
+  const handleCpfCnpjChange = (e) => {
+    setCpfCnpj(formatarCpfCnpj(e.target.value));
   };
 
   const handleSubmit = async (event) => {
@@ -30,14 +56,22 @@ const CadastroUsuario = () => {
       return;
     }
 
+    if (tipoUsuario === '2' && matricula.length !== 11) {
+      setSnackbarMessage('A matrícula deve ter exatamente 11 dígitos.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      return;
+    }
+
     const usuario = {
-      cpf: tipoPessoa === 'fisica' ? cpf.replace(/\D/g, '') : null,
-      cnpj: tipoPessoa === 'juridica' ? cnpj.replace(/\D/g, '') : null,
+      cpf: tipoPessoa === 'fisica' ? limparFormato(cpfCnpj) : null,
+      cnpj: tipoPessoa === 'juridica' ? limparFormato(cpfCnpj) : null,
       nome,
       sobrenome: tipoPessoa === 'fisica' ? sobrenome : null,
-      razaoSocial: tipoPessoa === 'juridica' ? razaoSocial : null,  // Enviar razão social para pessoa jurídica
+      razaoSocial: tipoPessoa === 'juridica' ? razaoSocial : null,
       password: senha,
       tipoUsuario: parseInt(tipoUsuario),
+      matricula: tipoUsuario === '2' ? matricula : null,
     };
 
     try {
@@ -47,14 +81,14 @@ const CadastroUsuario = () => {
         setSnackbarMessage('Usuário cadastrado com sucesso!');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
-        setCpf('');
-        setCnpj('');
+        setCpfCnpj('');
         setNome('');
         setSobrenome('');
-        setRazaoSocial('');  // Limpar o campo de razão social
+        setRazaoSocial('');
         setSenha('');
         setConfirmarSenha('');
         setTipoUsuario('1');
+        setMatricula('');
         setTipoPessoa('fisica');
       }
     } catch (error) {
@@ -72,13 +106,10 @@ const CadastroUsuario = () => {
           Cadastro de Usuário
         </Typography>
         <form onSubmit={handleSubmit}>
+          {/* Tipo de Pessoa */}
           <FormControl component="fieldset" margin="normal" fullWidth>
             <FormLabel component="legend">Tipo de Pessoa</FormLabel>
-            <RadioGroup
-              value={tipoPessoa}
-              onChange={(e) => setTipoPessoa(e.target.value)}
-              row
-            >
+            <RadioGroup value={tipoPessoa} onChange={(e) => setTipoPessoa(e.target.value)} row>
               <FormControlLabel value="fisica" control={<Radio />} label="Pessoa Física" />
               <FormControlLabel value="juridica" control={<Radio />} label="Pessoa Jurídica" />
             </RadioGroup>
@@ -86,6 +117,14 @@ const CadastroUsuario = () => {
 
           {tipoPessoa === 'fisica' && (
             <>
+              {/* Tipo de Usuário (somente aparece quando for pessoa física) */}
+              <FormControl component="fieldset" margin="normal" fullWidth>
+                <FormLabel component="legend">Tipo de Usuário</FormLabel>
+                <RadioGroup value={tipoUsuario} onChange={(e) => setTipoUsuario(e.target.value)} row>
+                  <FormControlLabel value="1" control={<Radio />} label="Usuário" />
+                  <FormControlLabel value="2" control={<Radio />} label="Funcionário" />
+                </RadioGroup>
+              </FormControl>
               <TextField
                 label="Nome"
                 variant="outlined"
@@ -106,20 +145,43 @@ const CadastroUsuario = () => {
                 required
               />
 
+                {/* Campo de matrícula, caso seja funcionário */}
+                {tipoUsuario === '2' && (
+                  <TextField
+                    label="Matrícula"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    value={matricula}
+                    onChange={(e) => setMatricula(limparFormato(e.target.value))}
+                    inputProps={{ maxLength: 11 }}
+                    required
+                  />
+                )}
+                
               <TextField
                 label="CPF"
                 variant="outlined"
                 fullWidth
                 margin="normal"
-                value={cpf}
-                onChange={(e) => setCpf(e.target.value)}
+                value={cpfCnpj}
+                onChange={handleCpfCnpjChange}
                 required
               />
+
+
             </>
           )}
 
           {tipoPessoa === 'juridica' && (
             <>
+              {/* Somente usuário para pessoa jurídica */}
+              <FormControl component="fieldset" margin="normal" fullWidth>
+                <FormLabel component="legend">Tipo de Usuário</FormLabel>
+                <RadioGroup value="1" row>
+                  <FormControlLabel value="1" control={<Radio />} label="Usuário" disabled />
+                </RadioGroup>
+              </FormControl>
               <TextField
                 label="Nome da Empresa"
                 variant="outlined"
@@ -145,10 +207,11 @@ const CadastroUsuario = () => {
                 variant="outlined"
                 fullWidth
                 margin="normal"
-                value={cnpj}
-                onChange={(e) => setCnpj(e.target.value)}
+                value={cpfCnpj}
+                onChange={handleCpfCnpjChange}
                 required
               />
+
             </>
           )}
 

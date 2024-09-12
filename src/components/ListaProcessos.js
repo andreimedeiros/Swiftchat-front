@@ -45,22 +45,38 @@ const ListaProcessos = () => {
   };
 
   return (
-    <Container maxWidth="lg">
-      <Paper elevation={3} sx={{ padding: 4, marginTop: 4 }}>
+    <Container 
+      maxWidth="lg" 
+      sx={{ 
+        display: 'flex',
+        flexDirection: 'column',
+        height: '10vh', // Faz com que o container ocupe toda a altura da página
+        paddingBottom: 10, // Espaço para o conteúdo
+        marginTop: 4 // Margem no topo
+      }}
+    >
+      <Paper elevation={3} sx={{ padding: 4, flexGrow: 1 }}>
         <Typography variant="h4" gutterBottom color="primary">
           {/* Exibe o título conforme o tipo de usuário */}
           {userType === 'USUARIO' ? 'Meus Processos' : 'Todos os Processos'}
         </Typography>
-        <TableContainer component={Paper}>
+
+        <TableContainer 
+          component={Paper} 
+          sx={{ 
+            maxHeight: '70vh', // Limita a altura máxima da tabela
+            overflowY: 'auto', // Adiciona a barra de rolagem vertical
+          }}
+        >
           <Table>
             <TableHead>
-              <TableRow>
-                <TableCell>Nome</TableCell>
-                <TableCell>Número do Processo</TableCell> {/* Coluna para o número do processo */}
-                <TableCell>Setor Atual</TableCell>
-                <TableCell>Tipo de Processo</TableCell>
-                <TableCell>Descrição</TableCell>
-                <TableCell>Ações</TableCell>
+            <TableRow>
+                <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Nome</TableCell>
+                <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Número do Processo</TableCell>
+                <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Setor Atual</TableCell>
+                <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Tipo de Processo</TableCell>
+                <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Descrição</TableCell>
+                <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
