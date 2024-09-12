@@ -32,32 +32,36 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
   const handleCadastro = async () => {
     if (nome && tipoProcesso && descricao) {
       try {
-        const processData = {
+        const formData = new FormData();
+        formData.append('processo', new Blob([JSON.stringify({
           nome,
           descricao,
-          tipoProcesso: {
-            id: tipoProcesso,
-          },
-        };
-
-        const response = await api.post('/processos', processData, {
+          tipoProcesso: { id: tipoProcesso },
+        })], { type: 'application/json' }));
+        
+        
+        if (arquivo) {
+          formData.append('arquivo', arquivo);
+        }
+  
+        const response = await api.post('/processos', formData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
           },
         });
-
+  
         if (response.status === 200) {
           // Limpa os campos após o cadastro
           setNome('');
           setDescricao('');
           setTipoProcesso('');
           setArquivo(null);
-
+  
           setSnackbarMessage('Processo cadastrado com sucesso!');
           setSnackbarSeverity('success');
           setSnackbarOpen(true);
-
+  
           if (typeof onSubmit === 'function') {
             onSubmit(response.data);
           }
@@ -74,6 +78,8 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
       setSnackbarOpen(true);
     }
   };
+  
+  
 
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
