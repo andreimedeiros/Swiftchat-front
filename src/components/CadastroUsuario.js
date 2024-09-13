@@ -100,8 +100,8 @@ const CadastroUsuario = () => {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ padding: 4, marginTop: 4 }}>
+    <Container maxWidth="sm" sx={{ maxHeight: '80vh', overflowY: 'auto', paddingBottom: 4 }}>
+      <Paper elevation={3} sx={{ padding: 4, marginTop: 4, maxHeight: '100%', overflowY: 'auto' }}>
         <Typography variant="h4" gutterBottom color="primary">
           Cadastro de Usuário
         </Typography>
@@ -145,20 +145,19 @@ const CadastroUsuario = () => {
                 required
               />
 
-                {/* Campo de matrícula, caso seja funcionário */}
-                {tipoUsuario === '2' && (
-                  <TextField
-                    label="Matrícula"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={matricula}
-                    onChange={(e) => setMatricula(limparFormato(e.target.value))}
-                    inputProps={{ maxLength: 11 }}
-                    required
-                  />
-                )}
-                
+              {tipoUsuario === '2' && (
+                <TextField
+                  label="Matrícula"
+                  variant="outlined"
+                  fullWidth
+                  margin="normal"
+                  value={matricula}
+                  onChange={(e) => setMatricula(limparFormato(e.target.value))}
+                  inputProps={{ maxLength: 11 }}
+                  required
+                />
+              )}
+              
               <TextField
                 label="CPF"
                 variant="outlined"
@@ -168,20 +167,11 @@ const CadastroUsuario = () => {
                 onChange={handleCpfCnpjChange}
                 required
               />
-
-
             </>
           )}
 
           {tipoPessoa === 'juridica' && (
             <>
-              {/* Somente usuário para pessoa jurídica */}
-              <FormControl component="fieldset" margin="normal" fullWidth>
-                <FormLabel component="legend">Tipo de Usuário</FormLabel>
-                <RadioGroup value="1" row>
-                  <FormControlLabel value="1" control={<Radio />} label="Usuário" disabled />
-                </RadioGroup>
-              </FormControl>
               <TextField
                 label="Nome da Empresa"
                 variant="outlined"
@@ -211,7 +201,6 @@ const CadastroUsuario = () => {
                 onChange={handleCpfCnpjChange}
                 required
               />
-
             </>
           )}
 

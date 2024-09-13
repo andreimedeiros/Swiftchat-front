@@ -68,7 +68,8 @@ function App() {
     return () => {
       window.removeEventListener('beforeunload', handleWindowClose);
     };
-  }, []);
+  }, 
+  );
 
   const isLoggedIn = !!localStorage.getItem('token'); // Verifica se o usuário está logado
   const userType = localStorage.getItem('userType'); // Pega o tipo de usuário

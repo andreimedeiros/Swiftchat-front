@@ -96,11 +96,17 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
   };
 
   return (
-    <Paper elevation={3} sx={{ padding: 4 }}>
+    <Paper elevation={3} sx={{ padding: 4, marginBottom: 4, overflowY: 'auto' }}>
       <Typography variant="h5" align="center" gutterBottom>
         Cadastro de Processo
       </Typography>
-      <Box display="flex" flexDirection="column" alignItems="center">
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        sx={{ maxHeight: '75vh', overflowY: 'auto', paddingBottom: 2 }}
+      >
+        {/* Campos do formulário */}
         <TextField
           label="Nome do Processo"
           variant="outlined"
@@ -123,6 +129,7 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
             ))}
           </Select>
         </FormControl>
+
         <TextField
           label="Descrição"
           variant="outlined"
@@ -133,7 +140,6 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
         />
         <FormControl fullWidth margin="normal">
           Anexar Documento
-          <InputLabel shrink={true}></InputLabel>
           <input
             id="arquivo"
             type="file"
