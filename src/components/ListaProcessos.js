@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Paper } from '@mui/material';
+import { 
+  Container, 
+  Typography, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Button, 
+  Paper, 
+  TextField 
+} from '@mui/material';
 // import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -8,6 +20,7 @@ import api from '../services/api';
 const ListaProcessos = () => {
   const [processos, setProcessos] = useState([]);
   const [userType, setUserType] = useState('');
+  const [searchTerm, setSearchTerm] = useState(''); // Estado para o termo de busca
 
   useEffect(() => {
     const storedUserType = localStorage.getItem('userType');
@@ -29,10 +42,6 @@ const ListaProcessos = () => {
     }
   };
 
-  // const handleEdit = (id) => {
-  //   console.log('Editar processo com ID:', id);
-  // };
-
   const handleDelete = async (id) => {
     try {
       await api.delete(`/processos/${id}`);
@@ -46,27 +55,25 @@ const ListaProcessos = () => {
   const handleDownload = async (id) => {
     try {
       const response = await api.get(`/processos/${id}/download`, {
-        responseType: 'blob',  // Baixar como blob
+        responseType: 'blob',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-  
-      // Extrair o nome do arquivo do cabeçalho Content-Disposition
+
       const contentDisposition = response.headers['content-disposition'];
-      let fileName = 'arquivo.pdf'; // Valor padrão
+      let fileName = 'arquivo.pdf';
       if (contentDisposition) {
         const matches = /filename="([^"]+)"/.exec(contentDisposition);
         if (matches != null && matches[1]) {
           fileName = matches[1];
         }
       }
-  
-      // Criar um link temporário para baixar o arquivo
+
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', fileName); // Usar o nome do arquivo real
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -74,19 +81,36 @@ const ListaProcessos = () => {
       console.error('Erro ao baixar o arquivo:', error);
     }
   };
-  
+
+  const filteredProcessos = processos.filter(processo => {
+    // Verifica se numeroProcesso existe e converte para string
+    if (processo.numeroProcesso) {
+      return processo.numeroProcesso.toString().includes(searchTerm);
+    }
+    return false;
+  });
+
   return (
     <Container 
       maxWidth="lg" 
-      sx={{ display: 'flex', flexDirection: 'column', height: '10vh', paddingBottom: 10, marginTop: 4 }}
+      sx={{ display: 'flex', flexDirection: 'column', paddingBottom: 10, marginTop: 4 }}
     >
       <Paper elevation={3} sx={{ padding: 4, flexGrow: 1 }}>
         <Typography variant="h4" gutterBottom color="primary">
           {userType === 'USUARIO' ? 'Meus Processos' : 'Todos os Processos'}
         </Typography>
 
+        <TextField
+          label="Buscar Processo pelo Número"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)} // Atualiza o termo de busca
+        />
+
         <TableContainer component={Paper} sx={{ maxHeight: '70vh', overflowY: 'auto' }}>
-          <Table>
+          <Table stickyHeader>
             <TableHead>
               <TableRow>
                 <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Nome</TableCell>
@@ -99,32 +123,13 @@ const ListaProcessos = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {processos.map((processo) => (
+              {filteredProcessos.map((processo) => (
                 <TableRow key={processo.id}>
                   <TableCell>{processo.nome}</TableCell>
                   <TableCell>{processo.numeroProcesso}</TableCell>
                   <TableCell>{processo.setor ? processo.setor.nome : 'Setor Intermediário'}</TableCell>
                   <TableCell>{processo.tipoProcesso ? processo.tipoProcesso.nome : ''}</TableCell>
                   <TableCell>{processo.descricao}</TableCell>
-                  <TableCell>
-                    {/* <Button
-                      variant="outlined"
-                      color="primary"
-                      startIcon={<EditIcon />}
-                      onClick={() => handleEdit(processo.id)}
-                      style={{ marginRight: 8 }}
-                    >
-                      Editar
-                    </Button> */}
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      startIcon={<DeleteIcon />}
-                      onClick={() => handleDelete(processo.id)}
-                    >
-                      Excluir
-                    </Button>
-                  </TableCell>
                   <TableCell>
                     {processo.arquivo ? (
                       <Button
@@ -139,8 +144,25 @@ const ListaProcessos = () => {
                       'Sem arquivo'
                     )}
                   </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      startIcon={<DeleteIcon />}
+                      onClick={() => handleDelete(processo.id)}
+                    >
+                      Excluir
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
+              {filteredProcessos.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    Nenhum processo encontrado.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>
