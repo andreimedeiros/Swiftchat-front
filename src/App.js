@@ -57,20 +57,20 @@ function App() {
     navigate('/home'); 
   };
 
-  useEffect(() => {
-    // Adiciona o evento pra limpar o localStorage ao fechar ou recarregar a janela
-    const handleWindowClose = () => {
-      handleLogout(); // Chama o logout pra limpar os dados ao fechar e recarregar
-    };
+  // useEffect(() => {
+  //   // Adiciona o evento pra limpar o localStorage ao fechar ou recarregar a janela
+  //   const handleWindowClose = () => {
+  //     handleLogout(); // Chama o logout pra limpar os dados ao fechar e recarregar
+  //   };
 
-    window.addEventListener('beforeunload', handleWindowClose);
+  //   window.addEventListener('beforeunload', handleWindowClose);
 
     
-    return () => {
-      window.removeEventListener('beforeunload', handleWindowClose);
-    };
-  }, 
-  );
+  //   return () => {
+  //     window.removeEventListener('beforeunload', handleWindowClose);
+  //   };
+  // }, 
+  // );
 
   const isLoggedIn = !!localStorage.getItem('token'); // Verifica se o usuário está logado
   const userType = localStorage.getItem('userType'); // Pega o tipo de usuário
