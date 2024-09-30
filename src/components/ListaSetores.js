@@ -13,7 +13,7 @@ const ListaSetores = () => {
 
   const fetchSetores = async () => {
     try {
-      const response = await api.get('/setores');
+      const response = await api.get('/api/setores');
       setSetores(response.data);
     } catch (error) {
       console.error('Erro ao buscar setores:', error);
@@ -26,7 +26,7 @@ const ListaSetores = () => {
 
   const handleDelete = async (id) => {
     try {
-      await api.delete(`/setores/${id}`);
+      await api.delete(`/api/setores/${id}`);
       setSetores(setores.filter(setor => setor.id !== id));
       console.log('Excluir setor com ID:', id);
     } catch (error) {

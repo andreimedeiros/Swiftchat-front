@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { Container, TextField, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Button, Typography, Paper, Snackbar, Alert } from '@mui/material';
+import { Container, TextField, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Button, Typography, Paper, Snackbar, Alert, MenuItem } from '@mui/material';
 
 const CadastroUsuario = () => {
   const [tipoPessoa, setTipoPessoa] = useState('fisica');
@@ -12,6 +12,8 @@ const CadastroUsuario = () => {
   const [confirmarSenha, setConfirmarSenha] = useState('');
   const [tipoUsuario, setTipoUsuario] = useState('1'); // Usuário comum por padrão
   const [matricula, setMatricula] = useState(''); // Adicionar matrícula se for funcionário
+  const [setores, setSetores] = useState([]); // Lista de setores
+  const [setorSelecionado, setSetorSelecionado] = useState(''); // Setor selecionado
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
@@ -72,10 +74,12 @@ const CadastroUsuario = () => {
       password: senha,
       tipoUsuario: parseInt(tipoUsuario),
       matricula: tipoUsuario === '2' ? matricula : null,
+      setor: tipoUsuario === '2' ? { id: setorSelecionado } : null // Enviar setor se for funcionário
     };
 
     try {
-      const response = await api.post('/usuarios/register', usuario);
+      // Requisição de cadastro de usuário sem token
+      const response = await api.post('/usuarios/register', usuario); // Sem headers de autorização
 
       if (response.status === 200) {
         setSnackbarMessage('Usuário cadastrado com sucesso!');
@@ -90,6 +94,7 @@ const CadastroUsuario = () => {
         setTipoUsuario('1');
         setMatricula('');
         setTipoPessoa('fisica');
+        setSetorSelecionado('');
       }
     } catch (error) {
       console.error('Erro ao cadastrar usuário:', error);
@@ -98,6 +103,24 @@ const CadastroUsuario = () => {
       setSnackbarOpen(true);
     }
   };
+
+  useEffect(() => {
+    // Carregar lista de setores
+    const fetchSetores = async () => {
+      try {
+        const response = await api.get('/setores');  // Sem token de autorização
+        setSetores(response.data);
+      } catch (error) {
+        console.error('Erro ao carregar setores:', error);
+      }
+    };
+  
+    if (tipoUsuario === '2') {  // Carrega os setores somente se o usuário for um funcionário
+      fetchSetores();
+    }
+  }, [tipoUsuario]);
+  
+
 
   return (
     <Container maxWidth="sm" sx={{ maxHeight: '80vh', overflowY: 'auto', paddingBottom: 4 }}>
@@ -146,18 +169,38 @@ const CadastroUsuario = () => {
               />
 
               {tipoUsuario === '2' && (
-                <TextField
-                  label="Matrícula"
-                  variant="outlined"
-                  fullWidth
-                  margin="normal"
-                  value={matricula}
-                  onChange={(e) => setMatricula(limparFormato(e.target.value))}
-                  inputProps={{ maxLength: 11 }}
-                  required
-                />
+                <>
+                  <TextField
+                    label="Matrícula"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    value={matricula}
+                    onChange={(e) => setMatricula(limparFormato(e.target.value))}
+                    inputProps={{ maxLength: 11 }}
+                    required
+                  />
+
+                  <FormControl fullWidth margin="normal">
+                    <FormLabel>Setor</FormLabel>
+                    <TextField
+                      select
+                      value={setorSelecionado}
+                      onChange={(e) => setSetorSelecionado(e.target.value)}
+                      required
+                    >
+                      <MenuItem value="">Selecione um Setor</MenuItem>
+                      {setores.map((setor) => (
+                        <MenuItem key={setor.id} value={setor.id}>
+                          {setor.nome}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </FormControl>
+
+                </>
               )}
-              
+
               <TextField
                 label="CPF"
                 variant="outlined"
