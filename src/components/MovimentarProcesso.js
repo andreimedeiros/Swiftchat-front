@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, FormControl, InputLabel, Select, MenuItem, Button, Paper, Snackbar, Alert } from '@mui/material';
+import { Container, Typography, FormControl, InputLabel, Button, Paper, Snackbar, Alert, TextField, Autocomplete } from '@mui/material';
 import api from '../services/api';
 
 const MovimentarProcesso = () => {
   const [processos, setProcessos] = useState([]);
-  const [processoSelecionado, setProcessoSelecionado] = useState('');
+  const [processoSelecionado, setProcessoSelecionado] = useState(null); // Agora será um objeto, não apenas o ID
   const [setores, setSetores] = useState([]);
   const [setorDestino, setSetorDestino] = useState('');
 
@@ -37,15 +37,22 @@ const MovimentarProcesso = () => {
 
   const handleMovimentar = async () => {
     try {
-      await api.put(`/processos/${processoSelecionado}/setor/${setorDestino}`);
-      
+      if (!processoSelecionado || !setorDestino) {
+        setSnackbarMessage('Selecione um processo e um setor destino.');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+        return;
+      }
+
+      await api.put(`/processos/${processoSelecionado.id}/setor/${setorDestino}`);
+
       // Atualiza a lista de processos após a movimentação
       fetchProcessos();
 
       setSnackbarMessage('Processo movimentado com sucesso!');
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
-      setProcessoSelecionado('');
+      setProcessoSelecionado(null);
       setSetorDestino('');
     } catch (error) {
       console.error('Erro ao movimentar processo:', error);
@@ -65,34 +72,38 @@ const MovimentarProcesso = () => {
         <Typography variant="h4" gutterBottom color="primary">
           Movimentar Processo
         </Typography>
+
+        {/* Dropdown com Autocomplete para buscar pelo número do processo */}
         <FormControl variant="outlined" fullWidth margin="normal" required>
-          <InputLabel>Selecione o Processo</InputLabel>
-          <Select
+          <Autocomplete
+            options={processos}
+            getOptionLabel={(processo) => `Processo Nº ${processo.numeroProcesso} (Setor atual: ${processo.setor ? processo.setor.nome : 'Intermediário'})`}
             value={processoSelecionado}
-            onChange={(e) => setProcessoSelecionado(e.target.value)}
-            label="Selecione o Processo"
-          >
-            {processos.map((processo) => (
-              <MenuItem key={processo.id} value={processo.id}>
-                {`Processo Nº ${processo.numeroProcesso} (Setor atual: ${processo.setor ? processo.setor.nome : 'Intermediário'})`}
-              </MenuItem>
-            ))}
-          </Select>
+            onChange={(event, newValue) => setProcessoSelecionado(newValue)}
+            renderInput={(params) => <TextField {...params} label="Selecione o Processo" variant="outlined" />}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+          />
         </FormControl>
 
+        {/* Dropdown para selecionar o setor destino */}
         <FormControl variant="outlined" fullWidth margin="normal" required>
           <InputLabel>Selecione o Setor Destino</InputLabel>
-          <Select
+          <TextField
+            select
             value={setorDestino}
             onChange={(e) => setSetorDestino(e.target.value)}
-            label="Selecione o Setor Destino"
+            label=""
+            SelectProps={{
+              native: true,
+            }}
           >
+            <option value=""></option>
             {setores.map((setor) => (
-              <MenuItem key={setor.id} value={setor.id}>
+              <option key={setor.id} value={setor.id}>
                 {setor.nome}
-              </MenuItem>
+              </option>
             ))}
-          </Select>
+          </TextField>
         </FormControl>
 
         <Button variant="contained" color="primary" onClick={handleMovimentar} sx={{ marginTop: 2 }}>
