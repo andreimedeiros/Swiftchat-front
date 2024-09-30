@@ -5,15 +5,16 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme'; 
-import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate } from 'react-router-dom'; // Import the useNavigate here
+import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate } from 'react-router-dom'; 
 import './App.css'; 
-import CadastroProcesso from './components/CadastroProcesso'; // Un-comment to use CadastroProcesso
+import CadastroProcesso from './components/CadastroProcesso'; 
 import ListaProcessos from './components/ListaProcessos';
 import MovimentarProcesso from './components/MovimentarProcesso';
 import Home from './components/Home';
 import SideMenu from './components/SideMenu';
 import Login from './components/Login';
 import CadastroUsuario from './components/CadastroUsuario';
+import ListaSetores from './components/ListaSetores';
 
 function AppWrapper() {
   return (
@@ -24,28 +25,28 @@ function AppWrapper() {
 }
 
 function App() {
-  const [drawerOpen, setDrawerOpen] = useState(false); // Controle do SideMenu
-  const [loginOpen, setLoginOpen] = useState(false); // Controle do modal de login
+  const [drawerOpen, setDrawerOpen] = useState(false); 
+  const [loginOpen, setLoginOpen] = useState(false); 
 
-  const navigate = useNavigate(); // Coloque o useNavigate aqui para uso dentro do App
+  const navigate = useNavigate(); 
 
-  // Função para abrir/fechar o SideMenu
+
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
   };
 
-  // Modifique para usar o navigate em vez de window.location.href
+  
   const handleMenuClick = (viewName) => {
-    setDrawerOpen(false); // Fecha o SideMenu após clicar em um item
-    navigate(`/${viewName}`); // Use navigate para redirecionar
+    setDrawerOpen(false); 
+    navigate(`/${viewName}`); 
   };
 
   const handleLoginOpen = () => {
-    setLoginOpen(true); // Abre o modal de login
+    setLoginOpen(true); 
   };
 
   const handleLoginClose = () => {
-    setLoginOpen(false); // Fecha o modal de login
+    setLoginOpen(false); 
   };
 
   const handleLogout = () => {
@@ -53,18 +54,18 @@ function App() {
     localStorage.removeItem('userType');
     localStorage.removeItem('userName');
     delete axios.defaults.headers.common['Authorization'];
-    navigate('/home'); // Use navigate para redirecionar para a página inicial
+    navigate('/home'); 
   };
 
   useEffect(() => {
-    // Adiciona o evento para limpar o localStorage ao fechar ou recarregar a janela
+    // Adiciona o evento pra limpar o localStorage ao fechar ou recarregar a janela
     const handleWindowClose = () => {
-      handleLogout(); // Chama o logout para limpar os dados ao fechar/recarregar
+      handleLogout(); // Chama o logout pra limpar os dados ao fechar e recarregar
     };
 
     window.addEventListener('beforeunload', handleWindowClose);
 
-    // Remove o event listener quando o componente é desmontado
+    
     return () => {
       window.removeEventListener('beforeunload', handleWindowClose);
     };
@@ -141,6 +142,7 @@ function App() {
                 <>
                   <Route path="/list" element={<ListaProcessos />} />
                   <Route path="/movimentar" element={<MovimentarProcesso />} />
+                  <Route path="/setores" element={<ListaSetores />} />
                 </>
               )}
               <Route path="/cadastrarUsuario" element={<CadastroUsuario />} />

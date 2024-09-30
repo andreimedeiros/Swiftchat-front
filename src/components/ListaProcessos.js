@@ -131,7 +131,7 @@ const ListaProcessos = () => {
                   <TableCell>{processo.setor ? processo.setor.nome : 'Setor Intermediário'}</TableCell>
                   <TableCell>{processo.tipoProcesso ? processo.tipoProcesso.nome : ''}</TableCell>
                   <TableCell>{processo.descricao}</TableCell>
-                  <TableCell>{processo.status ? 'status aqui' : 'Em Andamento'}</TableCell>
+                  <TableCell>{processo.statusProcesso}</TableCell> 
                   <TableCell>
                     {processo.arquivo ? (
                       <Button

@@ -5,7 +5,8 @@ import ViewListIcon from '@mui/icons-material/ViewList';
 import AddIcon from '@mui/icons-material/Add';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import PersonAddIcon from '@mui/icons-material/PersonAdd'; 
-import ExitToAppIcon from '@mui/icons-material/ExitToApp'; 
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import ApartmentIcon from '@mui/icons-material/Apartment'; 
 import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 
 const SideMenu = ({ open, onClose, onLogout }) => {
@@ -78,6 +79,12 @@ const SideMenu = ({ open, onClose, onLogout }) => {
               <ListItemText primary="Movimentar Processo" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
             </ListItem>
             <Divider style={{ backgroundColor: '#008F6D' }} />
+            <ListItem button onClick={() => navigate('/setores')} style={{ justifyContent: 'center' }}>
+              <ListItemIcon>
+                <ApartmentIcon style={{ color: '#ffffff' }} />
+              </ListItemIcon>
+              <ListItemText primary="Setores" primaryTypographyProps={{ style: { color: '#ffffff' } }} />
+            </ListItem>
           </>
         )}
 
