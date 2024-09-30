@@ -118,8 +118,9 @@ const ListaProcessos = () => {
                 <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Setor Atual</TableCell>
                 <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Tipo de Processo</TableCell>
                 <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Descrição</TableCell>
-                <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Ações</TableCell>
+                <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Status</TableCell>
                 <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Arquivo</TableCell>
+                <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -130,6 +131,7 @@ const ListaProcessos = () => {
                   <TableCell>{processo.setor ? processo.setor.nome : 'Setor Intermediário'}</TableCell>
                   <TableCell>{processo.tipoProcesso ? processo.tipoProcesso.nome : ''}</TableCell>
                   <TableCell>{processo.descricao}</TableCell>
+                  <TableCell>{processo.status ? 'status aqui' : 'Em Andamento'}</TableCell>
                   <TableCell>
                     {processo.arquivo ? (
                       <Button
