@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, FormControl, InputLabel, Button, Paper, Snackbar, Alert, TextField, Autocomplete } from '@mui/material';
+import { Container, Typography, FormControl, Button, Paper, Snackbar, Alert, TextField, Autocomplete } from '@mui/material';
 import api from '../services/api';
 
 const MovimentarProcesso = () => {
@@ -73,7 +73,7 @@ const MovimentarProcesso = () => {
           Movimentar Processo
         </Typography>
 
-        {/* Dropdown com Autocomplete para buscar pelo número do processo */}
+        {/* Possui Autocomplete para buscar pelo número do processo */}
         <FormControl variant="outlined" fullWidth margin="normal" required>
           <Autocomplete
             options={processos}
@@ -85,14 +85,13 @@ const MovimentarProcesso = () => {
           />
         </FormControl>
 
-        {/* Dropdown para selecionar o setor destino */}
+        {/* Setor destino */}
         <FormControl variant="outlined" fullWidth margin="normal" required>
-          <InputLabel>Selecione o Setor Destino</InputLabel>
           <TextField
             select
+            label="Selecione o Setor Destino"
             value={setorDestino}
             onChange={(e) => setSetorDestino(e.target.value)}
-            label=""
             SelectProps={{
               native: true,
             }}

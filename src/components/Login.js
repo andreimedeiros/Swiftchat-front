@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, TextField, Typography, Paper, Snackbar, Alert } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import axiosRetry from 'axios-retry'; // Biblioteca para retries
+import axiosRetry from 'axios-retry';
 
 const Login = ({ onClose }) => {
   const [cpfCnpj, setCpfCnpj] = useState('');
@@ -12,20 +12,13 @@ const Login = ({ onClose }) => {
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const navigate = useNavigate();
 
-  // retries automáticos
   axiosRetry(axios, {
-    retries: 3, // TOLERÂNCIA A FALAHAS -> Tenta 3 vezes em caso de erro
-    retryDelay: (retryCount) => {
-      return retryCount * 1000; //
-    },
-    retryCondition: (error) => {
-      return error.response.status >= 500; // Somente tenta de novo em erros 5xx (falha no servidor)
-    },
+    retries: 3,
+    retryDelay: (retryCount) => retryCount * 1000, // TOLERÂNCIA A FALAHAS -> Tenta 3 vezes em caso de erro
+    retryCondition: (error) => error.response.status >= 500, // Somente tenta de novo em erros 5xx (falha no servidor)
   });
-
   // Função pra remover caracteres nao numericos
   const limparFormato = (valor) => valor.replace(/\D/g, '');
-
   // Função pra formatar CPF e CNPJ conforme o usuário digita
   const formatarCpfCnpj = (valor) => {
     valor = limparFormato(valor);
@@ -41,12 +34,11 @@ const Login = ({ onClose }) => {
     setCpfCnpj(formatarCpfCnpj(e.target.value));
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (event) => {
+    event.preventDefault();  // Previne o comportamento padrão do submit
+
     try {
       const cleanCpfCnpj = limparFormato(cpfCnpj);
-
-     
-
       const response = await axios.post('http://localhost:8080/api/login', {
         cpfCnpj: cleanCpfCnpj,
         password,
@@ -56,7 +48,6 @@ const Login = ({ onClose }) => {
 
       const { token, userType, userName } = response.data;
 
-      // Log de sucesso no login
       console.log(`Login bem-sucedido para o usuário: ${userName} (${userType})`);
 
       localStorage.setItem('token', token);
@@ -100,28 +91,32 @@ const Login = ({ onClose }) => {
         Login
       </Typography>
       <Box display="flex" flexDirection="column" alignItems="center">
-        <TextField
-          label="CPF/CNPJ"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={cpfCnpj}
-          onChange={handleCpfCnpjChange}
-          required
-        />
-        <TextField
-          label="Senha"
-          type="password"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <Button variant="contained" color="primary" onClick={handleLogin} sx={{ marginTop: 2 }}>
-          Login
-        </Button>
+        <form onSubmit={handleLogin} style={{ width: '100%' }}>
+          <TextField
+            label="CPF/CNPJ"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={cpfCnpj}
+            onChange={handleCpfCnpjChange}
+            required
+          />
+          <TextField
+            label="Senha"
+            type="password"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <Box display="flex" justifyContent="center" sx={{ marginTop: 2 }}>
+            <Button type="submit" variant="contained" color="primary">
+              Login
+            </Button>
+          </Box>
+        </form>
       </Box>
 
       <Snackbar
