@@ -42,7 +42,7 @@ const ListaSetores = () => {
       setSnackbarOpen(true);
     } catch (error) {
       console.error('Erro ao excluir setor:', error);
-      setSnackbarMessage('Erro ao excluir setor.');
+      setSnackbarMessage('Erro ao excluir setor. (Existem processos vinculados a este setor)');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
@@ -154,7 +154,7 @@ const ListaSetores = () => {
             sx={{ marginBottom: 2 }}
           />
           <Button variant="contained" color="primary" onClick={handleSave}>
-            Adicionar
+            Alterar
           </Button>
         </Box>
       </Modal>
