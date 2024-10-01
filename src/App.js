@@ -15,6 +15,8 @@ import SideMenu from './components/SideMenu';
 import Login from './components/Login';
 import CadastroUsuario from './components/CadastroUsuario';
 import ListaSetores from './components/ListaSetores';
+import AvaliarProcesso from './components/AvaliarProcesso';
+import EditarProcesso from './components/EditarProcesso'; // Importa o componente EditarProcesso
 
 function AppWrapper() {
   return (
@@ -30,12 +32,10 @@ function App() {
 
   const navigate = useNavigate(); 
 
-
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
   };
 
-  
   const handleMenuClick = (viewName) => {
     setDrawerOpen(false); 
     navigate(`/${viewName}`); 
@@ -56,21 +56,6 @@ function App() {
     delete axios.defaults.headers.common['Authorization'];
     navigate('/home'); 
   };
-
-  // useEffect(() => {
-  //   // Adiciona o evento pra limpar o localStorage ao fechar ou recarregar a janela
-  //   const handleWindowClose = () => {
-  //     handleLogout(); // Chama o logout pra limpar os dados ao fechar e recarregar
-  //   };
-
-  //   window.addEventListener('beforeunload', handleWindowClose);
-
-    
-  //   return () => {
-  //     window.removeEventListener('beforeunload', handleWindowClose);
-  //   };
-  // }, 
-  // );
 
   const isLoggedIn = !!localStorage.getItem('token'); // Verifica se o usuário está logado
   const userType = localStorage.getItem('userType'); // Pega o tipo de usuário
@@ -100,7 +85,7 @@ function App() {
             }}>
             {window.location.pathname === '/' || window.location.pathname === '/home' ? 'SwiftChat' : 'Gestão de Processos'}
           </Typography>
-          {!isLoggedIn && ( // Exibe o botão de login apenas se não estiver logado
+          {!isLoggedIn && ( 
             <Button 
               variant="outlined" 
               color="inherit" 
@@ -118,38 +103,44 @@ function App() {
           )}
         </Toolbar>
       </AppBar>
-      {/* Menu lateral */}
+
       <SideMenu 
         open={drawerOpen} 
         onClose={handleDrawerToggle} 
         onMenuClick={handleMenuClick} 
         onLogout={handleLogout}
       />
+
       <Container className="container" maxWidth="lg">
         <Box display="flex" flexDirection="column" alignItems="center">
           <Box width="100%">
             <Routes>
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={<Home />} />
-              {/* Exibe as rotas apenas se estiver logado */}
+
               {isLoggedIn && userType === 'USUARIO' && (
                 <>
                   <Route path="/list" element={<ListaProcessos />} />
-                  <Route path="/add" element={<CadastroProcesso />} /> {/* Adicione a rota de Cadastro */}
+                  <Route path="/add" element={<CadastroProcesso />} />
+                  <Route path="/editar-processo/:id" element={<EditarProcesso />} /> {/* Nova rota de edição */}
                 </>
               )}
+
               {isLoggedIn && userType === 'FUNCIONARIO' && (
                 <>
                   <Route path="/list" element={<ListaProcessos />} />
                   <Route path="/movimentar" element={<MovimentarProcesso />} />
                   <Route path="/setores" element={<ListaSetores />} />
+                  <Route path="/avaliar-processo/:id" element={<AvaliarProcesso />} />
                 </>
               )}
+
               <Route path="/cadastrarUsuario" element={<CadastroUsuario />} />
             </Routes>
           </Box>
         </Box>
       </Container>
+
       <Modal
         open={loginOpen}
         onClose={handleLoginClose}

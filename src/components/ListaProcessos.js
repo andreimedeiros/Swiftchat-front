@@ -1,33 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Container, 
-  Typography, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  Button, 
-  Paper, 
-  TextField 
+import {
+  Container,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Button,
+  Paper,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from '@mui/material';
-// import EditIcon from '@mui/icons-material/Edit';
+import { useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
+import EditIcon from '@mui/icons-material/Edit';
 import api from '../services/api';
 
 const ListaProcessos = () => {
   const [processos, setProcessos] = useState([]);
   const [userType, setUserType] = useState('');
-  const [searchTerm, setSearchTerm] = useState(''); // Estado para o termo de busca
+  const [userSetor, setUserSetor] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [processoToDelete, setProcessoToDelete] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUserType = localStorage.getItem('userType');
     setUserType(storedUserType);
 
+    fetchUserSetor();
     fetchProcessos();
   }, []);
+
+  const fetchUserSetor = async () => {
+    try {
+      const response = await api.get('/usuarios/me', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      setUserSetor(response.data.setor.nome); // Atualize conforme a estrutura de dados
+    } catch (error) {
+      console.error('Erro ao buscar setor do usuário:', error);
+    }
+  };
 
   const fetchProcessos = async () => {
     try {
@@ -45,8 +69,8 @@ const ListaProcessos = () => {
   const handleDelete = async (id) => {
     try {
       await api.delete(`/processos/${id}`);
-      setProcessos(processos.filter(processo => processo.id !== id));
-      console.log('Excluir processo com ID:', id);
+      setProcessos(processos.filter((processo) => processo.id !== id));
+      handleCloseDeleteDialog(); // Fecha o diálogo após a exclusão
     } catch (error) {
       console.error('Erro ao excluir processo:', error);
     }
@@ -54,26 +78,16 @@ const ListaProcessos = () => {
 
   const handleDownload = async (id) => {
     try {
-      const response = await api.get(`/processos/${id}/download`, {
+      const response = await api.get(`/processos/${id}/download-todos-arquivos`, {
         responseType: 'blob',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-
-      const contentDisposition = response.headers['content-disposition'];
-      let fileName = 'arquivo.pdf';
-      if (contentDisposition) {
-        const matches = /filename="([^"]+)"/.exec(contentDisposition);
-        if (matches != null && matches[1]) {
-          fileName = matches[1];
-        }
-      }
-
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', fileName);
+      link.setAttribute('download', 'arquivos_processo.zip'); // Nome do arquivo ZIP
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -81,20 +95,33 @@ const ListaProcessos = () => {
       console.error('Erro ao baixar o arquivo:', error);
     }
   };
+  
 
-  const filteredProcessos = processos.filter(processo => {
-    // Verifica se numeroProcesso existe e converte para string
-    if (processo.numeroProcesso) {
-      return processo.numeroProcesso.toString().includes(searchTerm);
-    }
-    return false;
-  });
+
+  const handleAvaliar = (id) => {
+    navigate(`/avaliar-processo/${id}`);
+  };
+
+  const handleEditar = (id) => {
+    navigate(`/editar-processo/${id}`); // Redireciona para a página de edição de processo
+  };
+
+  const handleOpenDeleteDialog = (processo) => {
+    setProcessoToDelete(processo);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+    setProcessoToDelete(null);
+  };
+
+  const filteredProcessos = processos.filter((processo) =>
+    processo.numeroProcesso?.toString().includes(searchTerm)
+  );
 
   return (
-    <Container 
-      maxWidth="lg" 
-      sx={{ display: 'flex', flexDirection: 'column', paddingBottom: 10, marginTop: 4 }}
-    >
+    <Container maxWidth="lg" sx={{ display: 'flex', flexDirection: 'column', paddingBottom: 10, marginTop: 4 }}>
       <Paper elevation={3} sx={{ padding: 4, flexGrow: 1 }}>
         <Typography variant="h4" gutterBottom color="primary">
           {userType === 'USUARIO' ? 'Meus Processos' : 'Todos os Processos'}
@@ -106,7 +133,7 @@ const ListaProcessos = () => {
           fullWidth
           margin="normal"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)} // Atualiza o termo de busca
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
 
         <TableContainer component={Paper} sx={{ maxHeight: '70vh', overflowY: 'auto' }}>
@@ -119,7 +146,6 @@ const ListaProcessos = () => {
                 <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Tipo de Processo</TableCell>
                 <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Descrição</TableCell>
                 <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Status</TableCell>
-                <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Arquivo</TableCell>
                 <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -128,33 +154,53 @@ const ListaProcessos = () => {
                 <TableRow key={processo.id}>
                   <TableCell>{processo.nome}</TableCell>
                   <TableCell>{processo.numeroProcesso}</TableCell>
-                  <TableCell>{processo.setor ? processo.setor.nome : 'Setor Intermediário'}</TableCell>
+                  <TableCell>{processo.setor ? processo.setor.nome : 'Setor Intermediario'}</TableCell>
                   <TableCell>{processo.tipoProcesso ? processo.tipoProcesso.nome : ''}</TableCell>
                   <TableCell>{processo.descricao}</TableCell>
-                  <TableCell>{processo.statusProcesso}</TableCell> 
+                  <TableCell>{processo.statusProcesso ? processo.statusProcesso : 'Em trâmite'}</TableCell>
                   <TableCell>
-                    {processo.arquivo ? (
+                    {userType === 'FUNCIONARIO' && userSetor !== 'Setor Intermediario' && (
                       <Button
                         variant="outlined"
-                        color="primary"
-                        startIcon={<DownloadIcon />}
-                        onClick={() => handleDownload(processo.id)}
+                        color="secondary"
+                        onClick={() => handleAvaliar(processo.id)}
+                        sx={{ marginRight: 1 }}
                       >
-                        Download
+                        Avaliar
                       </Button>
-                    ) : (
-                      'Sem arquivo'
                     )}
-                  </TableCell>
-                  <TableCell>
                     <Button
                       variant="outlined"
-                      color="error"
-                      startIcon={<DeleteIcon />}
-                      onClick={() => handleDelete(processo.id)}
+                      color="primary"
+                      startIcon={<DownloadIcon />}
+                      onClick={() => handleDownload(processo.id)}
                     >
-                      Excluir
+                      Download
                     </Button>
+
+                    {/* Botão de Editar visível apenas para USUARIOS */}
+                    {userType === 'USUARIO' && (
+                      <Button
+                        variant="outlined"
+                        color="info"
+                        startIcon={<EditIcon />}
+                        onClick={() => handleEditar(processo.id)}
+                      >
+                        Editar
+                      </Button>
+                    )}
+
+                    {/* Botão de Excluir visível apenas para USUARIOS */}
+                    {userType === 'USUARIO' && (
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        startIcon={<DeleteIcon />}
+                        onClick={() => handleOpenDeleteDialog(processo)}
+                      >
+                        Excluir
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -169,6 +215,23 @@ const ListaProcessos = () => {
           </Table>
         </TableContainer>
       </Paper>
+
+      <Dialog open={deleteDialogOpen} onClose={handleCloseDeleteDialog}>
+        <DialogTitle>Confirmar Exclusão</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Tem certeza de que deseja excluir o processo "{processoToDelete?.nome}"? Esta ação não pode ser desfeita.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color="primary">
+            Cancelar
+          </Button>
+          <Button onClick={() => handleDelete(processoToDelete?.id)} color="error" autoFocus>
+            Excluir
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

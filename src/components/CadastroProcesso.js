@@ -7,7 +7,7 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
   const [tipoProcesso, setTipoProcesso] = useState('');
   const [nome, setNome] = useState(''); 
   const [descricao, setDescricao] = useState('');
-  const [arquivo, setArquivo] = useState(null);
+  const [arquivos, setArquivos] = useState([]); // Alterado para múltiplos arquivos
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
@@ -25,25 +25,28 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
     fetchTiposProcesso();
   }, []);
 
-  const handleArquivoChange = (event) => {
-    const file = event.target.files[0];
+  const handleArquivosChange = (event) => {
+    const selectedFiles = Array.from(event.target.files);
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
-    if (file.size > MAX_FILE_SIZE) {
-      alert('O arquivo excede o tamanho máximo de 5 MB.');
-      return;
-    }
+    // Verificação de múltiplos arquivos
+    const validFiles = selectedFiles.filter((file) => {
+      if (file.size > MAX_FILE_SIZE) {
+        alert(`O arquivo ${file.name} excede o tamanho máximo de 5 MB.`);
+        return false;
+      }
+      if (file.type !== 'application/pdf') {
+        alert(`Apenas arquivos PDF são permitidos (${file.name}).`);
+        return false;
+      }
+      return true;
+    });
 
-    if (file.type !== 'application/pdf') {
-      alert('Apenas arquivos PDF são permitidos.');
-      return;
-    }
-
-    setArquivo(file);
+    setArquivos(validFiles);
   };
 
   const handleCadastro = async () => {
-    if (nome && tipoProcesso && descricao) {
+    if (nome && tipoProcesso && descricao && arquivos.length > 0) { // Verifica se múltiplos arquivos foram selecionados
       try {
         const formData = new FormData();
         formData.append('processo', new Blob([JSON.stringify({
@@ -52,28 +55,26 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
           tipoProcesso: { id: tipoProcesso },
         })], { type: 'application/json' }));
         
-        if (arquivo) {
-          formData.append('arquivo', arquivo);
-        }
-  
+        arquivos.forEach((arquivo) => formData.append('arquivos', arquivo)); // Adiciona todos os arquivos ao FormData
+    
         const response = await api.post('/processos', formData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'multipart/form-data',
           },
         });
-  
+    
         if (response.status === 200) {
           // Limpa os campos após o cadastro
           setNome('');
           setDescricao('');
           setTipoProcesso('');
-          setArquivo(null);
-  
+          setArquivos([]);
+    
           setSnackbarMessage('Processo cadastrado com sucesso!');
           setSnackbarSeverity('success');
           setSnackbarOpen(true);
-  
+    
           if (typeof onSubmit === 'function') {
             onSubmit(response.data);
           }
@@ -85,7 +86,7 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
         setSnackbarOpen(true);
       }
     } else {
-      setSnackbarMessage('Por favor, preencha todos os campos.');
+      setSnackbarMessage('Por favor, preencha todos os campos e anexe pelo menos um arquivo.');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
@@ -139,12 +140,13 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
           onChange={(e) => setDescricao(e.target.value)}
         />
         <FormControl fullWidth margin="normal">
-          Anexar Documento
+          Anexar Documentos (PDF)
           <input
-            id="arquivo"
+            id="arquivos"
             type="file"
             accept="application/pdf"
-            onChange={handleArquivoChange}
+            onChange={handleArquivosChange}
+            multiple // Permitir seleção múltipla de arquivos
           />
         </FormControl>
         <Button variant="contained" color="primary" onClick={handleCadastro} sx={{ marginTop: 2 }}>
