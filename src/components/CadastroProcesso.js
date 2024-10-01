@@ -118,6 +118,13 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
     setSnackbarOpen(false);
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault(); 
+      handleCadastro();
+    }
+  };
+
   return (
     <Paper elevation={3} sx={{ padding: 4, marginBottom: 4, overflowY: 'auto' }}>
       <Typography variant="h5" align="center" gutterBottom>
@@ -137,6 +144,7 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
           margin="normal"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <FormControl fullWidth margin="normal">
           <InputLabel id="tipo-processo-label">Tipo de Processo</InputLabel>
@@ -144,6 +152,7 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
             labelId="tipo-processo-label"
             value={tipoProcesso}
             onChange={(e) => setTipoProcesso(e.target.value)}
+            onKeyDown={handleKeyDown}
           >
             {tiposProcesso.map(tipo => (
               <MenuItem key={tipo.id} value={tipo.id}>
@@ -160,6 +169,7 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
           margin="normal"
           value={descricao}
           onChange={(e) => setDescricao(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <FormControl fullWidth margin="normal">
           Anexar Documentos (PDF)
@@ -169,6 +179,7 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
             accept="application/pdf"
             onChange={handleArquivosChange}
             multiple
+            onKeyDown={handleKeyDown}
           />
         </FormControl>
         <Button variant="contained" color="primary" onClick={handleCadastro} sx={{ marginTop: 2 }}>

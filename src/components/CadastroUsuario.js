@@ -56,6 +56,18 @@ const CadastroUsuario = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    const nomeValido = /^[A-Z]/.test(nome);
+    const sobrenomeValido = /^[A-Z]/.test(sobrenome);
+    
+  
+
+    if (!nomeValido || !sobrenomeValido) {
+        setSnackbarMessage('O nome e o sobrenome devem começar com letra maiúscula.');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+        return;
+    }
+
     if (senha !== confirmarSenha) {
       setSnackbarMessage('As senhas não coincidem. Tente novamente.');
       setSnackbarSeverity('error');
@@ -126,6 +138,12 @@ const CadastroUsuario = () => {
       fetchSetores();
     }
   }, [tipoUsuario]);
+
+  // const handleKeyDown = (event) => {
+  //   if (event.key === 'Enter') {
+  //     handleSubmit(event);
+  //   }
+  // };
   
 
 
@@ -273,6 +291,7 @@ const CadastroUsuario = () => {
             margin="normal"
             value={confirmarSenha}
             onChange={(e) => setConfirmarSenha(e.target.value)}
+            
             required
           />
 
