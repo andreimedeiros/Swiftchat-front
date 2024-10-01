@@ -2,22 +2,45 @@ import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Typography, Paper, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert } from '@mui/material';
 import api from '../services/api';
 
+// Função para retry automático
+const retryRequest = async (apiCall, maxRetries = 3) => {
+  let attempts = 0;
+  while (attempts < maxRetries) {
+    try {
+      const response = await apiCall();
+      return response; // TOLERÂNCIA A FALHAS: Se a requisicao der certo, retorna o resultado
+    } catch (error) {
+      attempts++;
+      if (attempts >= maxRetries) throw error; // TOLERÂNCIA A FALHAS: Se passar dos n de tentativas, joga o erro
+    }
+  }
+};
+
 const CadastroProcesso = ({ onSubmit = () => {} }) => {
   const [tiposProcesso, setTiposProcesso] = useState([]);
   const [tipoProcesso, setTipoProcesso] = useState('');
   const [nome, setNome] = useState(''); 
   const [descricao, setDescricao] = useState('');
-  const [arquivos, setArquivos] = useState([]); // Alterado para múltiplos arquivos
+  const [arquivos, setArquivos] = useState([]); 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
+  // TOLERÂNCIA A FALHAS: timeout global para requisições
+  const apiInstance = api.create({
+    baseURL: '/api',
+    timeout: 5000,  // Timeout 
+  });
 
   useEffect(() => {
     const fetchTiposProcesso = async () => {
       try {
-        const response = await api.get('/tiposprocessos');
+        const response = await retryRequest(() => api.get('/tiposprocessos'));
         setTiposProcesso(response.data);
       } catch (error) {
+        setSnackbarMessage('Erro ao carregar tipos de processo. Verifique sua conexão.');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
         console.error('Erro ao buscar tipos de processo:', error);
       }
     };
@@ -29,7 +52,6 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
     const selectedFiles = Array.from(event.target.files);
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
-    // Verificação de múltiplos arquivos
     const validFiles = selectedFiles.filter((file) => {
       if (file.size > MAX_FILE_SIZE) {
         alert(`O arquivo ${file.name} excede o tamanho máximo de 5 MB.`);
@@ -46,7 +68,7 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
   };
 
   const handleCadastro = async () => {
-    if (nome && tipoProcesso && descricao && arquivos.length > 0) { // Verifica se múltiplos arquivos foram selecionados
+    if (nome && tipoProcesso && descricao && arquivos.length > 0) {
       try {
         const formData = new FormData();
         formData.append('processo', new Blob([JSON.stringify({
@@ -55,33 +77,33 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
           tipoProcesso: { id: tipoProcesso },
         })], { type: 'application/json' }));
         
-        arquivos.forEach((arquivo) => formData.append('arquivos', arquivo)); // Adiciona todos os arquivos ao FormData
-    
-        const response = await api.post('/processos', formData, {
+        arquivos.forEach((arquivo) => formData.append('arquivos', arquivo)); 
+
+        // TOLERÂNCIA A FALHAS: Retry automAtico na requisição de cadastro
+        const response = await retryRequest(() => apiInstance.post('/processos', formData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'multipart/form-data',
           },
-        });
-    
+        }));
+
         if (response.status === 200) {
-          // Limpa os campos após o cadastro
           setNome('');
           setDescricao('');
           setTipoProcesso('');
           setArquivos([]);
-    
+
           setSnackbarMessage('Processo cadastrado com sucesso!');
           setSnackbarSeverity('success');
           setSnackbarOpen(true);
-    
+
           if (typeof onSubmit === 'function') {
             onSubmit(response.data);
           }
         }
       } catch (error) {
         console.error('Erro ao cadastrar processo:', error);
-        setSnackbarMessage('Erro ao cadastrar processo. Por favor, tente novamente.');
+        setSnackbarMessage('Erro ao cadastrar processo. Verifique sua conexão ou tente novamente mais tarde.');
         setSnackbarSeverity('error');
         setSnackbarOpen(true);
       }
@@ -146,7 +168,7 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
             type="file"
             accept="application/pdf"
             onChange={handleArquivosChange}
-            multiple // Permitir seleção múltipla de arquivos
+            multiple
           />
         </FormControl>
         <Button variant="contained" color="primary" onClick={handleCadastro} sx={{ marginTop: 2 }}>

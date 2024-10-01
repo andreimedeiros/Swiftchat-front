@@ -154,7 +154,7 @@ const ListaSetores = () => {
             sx={{ marginBottom: 2 }}
           />
           <Button variant="contained" color="primary" onClick={handleSave}>
-            Alterar
+            Salvar
           </Button>
         </Box>
       </Modal>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, TextField, Typography, Paper, Snackbar, Alert } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import axiosRetry from 'axios-retry'; // Biblioteca para retries
 
 const Login = ({ onClose }) => {
   const [cpfCnpj, setCpfCnpj] = useState('');
@@ -11,45 +12,52 @@ const Login = ({ onClose }) => {
   const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const navigate = useNavigate();
 
-  // Função para remover caracteres não numéricos
-  const limparFormato = (valor) => {
-    return valor.replace(/\D/g, '');
-  };
+  // retries automáticos
+  axiosRetry(axios, {
+    retries: 3, // TOLERÂNCIA A FALAHAS -> Tenta 3 vezes em caso de erro
+    retryDelay: (retryCount) => {
+      return retryCount * 1000; //
+    },
+    retryCondition: (error) => {
+      return error.response.status >= 500; // Somente tenta de novo em erros 5xx (falha no servidor)
+    },
+  });
 
-  // Função para formatar CPF e CNPJ conforme o usuário digita
+  // Função pra remover caracteres nao numericos
+  const limparFormato = (valor) => valor.replace(/\D/g, '');
+
+  // Função pra formatar CPF e CNPJ conforme o usuário digita
   const formatarCpfCnpj = (valor) => {
-    valor = limparFormato(valor); // Removemos todos os caracteres não numéricos
-
+    valor = limparFormato(valor);
     if (valor.length <= 11) {
-      // Formatar CPF: 000.000.000-00
-      valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
-      valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
-      valor = valor.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      valor = valor.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
     } else if (valor.length <= 14) {
-      // Formatar CNPJ: 00.000.000/0000-00
-      valor = valor.replace(/^(\d{2})(\d)/, '$1.$2');
-      valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
-      valor = valor.replace(/\.(\d{3})(\d)/, '.$1/$2');
-      valor = valor.replace(/(\d{4})(\d)/, '$1-$2');
+      valor = valor.replace(/^(\d{2})(\d)/, '$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3').replace(/\.(\d{3})(\d)/, '.$1/$2').replace(/(\d{4})(\d)/, '$1-$2');
     }
-
     return valor;
   };
 
   const handleCpfCnpjChange = (e) => {
-    setCpfCnpj(formatarCpfCnpj(e.target.value)); // Aplica a formatação automaticamente
+    setCpfCnpj(formatarCpfCnpj(e.target.value));
   };
 
   const handleLogin = async () => {
     try {
-      const cleanCpfCnpj = limparFormato(cpfCnpj); // Enviamos apenas os números
+      const cleanCpfCnpj = limparFormato(cpfCnpj);
+
+     
 
       const response = await axios.post('http://localhost:8080/api/login', {
         cpfCnpj: cleanCpfCnpj,
         password,
+      }, {
+        timeout: 5000, // Tolerancia a Falhas:Timeout de 5 segundos
       });
 
       const { token, userType, userName } = response.data;
+
+      // Log de sucesso no login
+      console.log(`Login bem-sucedido para o usuário: ${userName} (${userType})`);
 
       localStorage.setItem('token', token);
       localStorage.setItem('userType', userType);
@@ -57,11 +65,26 @@ const Login = ({ onClose }) => {
 
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-      navigate('/home'); // Redireciona para a tela de boas-vindas
+      navigate('/home');
       onClose();
     } catch (error) {
-      console.error('Erro ao fazer login:', error.response || error);
-      setSnackbarMessage('Erro ao fazer login. Por favor, tente novamente.');
+      // Log de erro no login
+      if (error.code === 'ECONNABORTED') {
+        console.warn('A conexão demorou muito para responder.');
+        setSnackbarMessage('A conexão demorou muito para responder. Por favor, tente novamente mais tarde.');
+      } else if (error.response) {
+        console.error(`Erro no login: ${error.response.status} - ${error.response.data}`);
+        if (error.response.status >= 500) {
+          setSnackbarMessage('Erro no servidor. Estamos tentando novamente...');
+        } else if (error.response.status === 401) {
+          setSnackbarMessage('Credenciais inválidas. Verifique CPF/CNPJ e senha.');
+        } else {
+          setSnackbarMessage('Erro ao fazer login. Tente novamente.');
+        }
+      } else {
+        console.error('Erro desconhecido ao fazer login:', error);
+        setSnackbarMessage('Erro ao fazer login. Por favor, verifique sua conexão.');
+      }
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }

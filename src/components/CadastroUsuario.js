@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { Container, TextField, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Button, Typography, Paper, Snackbar, Alert, MenuItem } from '@mui/material';
+import axiosRetry from 'axios-retry';
+
+
+
+axiosRetry(api, { retries: 3 }); // T. A FALHAS :  Tenta 3 vezes em caso de falha de conxao 
 
 const CadastroUsuario = () => {
   const [tipoPessoa, setTipoPessoa] = useState('fisica');
@@ -97,7 +102,8 @@ const CadastroUsuario = () => {
         setSetorSelecionado('');
       }
     } catch (error) {
-      console.error('Erro ao cadastrar usuário:', error);
+            // OBSERVABLIDADE: log de erro detalhado
+      console.error('Erro ao cadastrar usuário:', error.response || error.message);
       setSnackbarMessage('Erro ao cadastrar usuário. Verifique os campos e tente novamente.');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
@@ -111,11 +117,12 @@ const CadastroUsuario = () => {
         const response = await api.get('/setores');  // Sem token de autorização
         setSetores(response.data);
       } catch (error) {
-        console.error('Erro ao carregar setores:', error);
+        // Observabilidade: log de erro ao carregar setores
+        console.error('Erro ao carregar setores:', error.response || error.message);
       }
     };
   
-    if (tipoUsuario === '2') {  // Carrega os setores somente se o usuário for um funcionário
+    if (tipoUsuario === '2') {  //Se for func. -> carrega os setores
       fetchSetores();
     }
   }, [tipoUsuario]);

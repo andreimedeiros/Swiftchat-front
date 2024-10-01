@@ -21,14 +21,14 @@ const ListaTiposProcessos = () => {
   };
 
   const handleEdit = (id) => {
-    console.log('Editar tipo de processo com ID:', id);
+    console.log('Editar tipo de processo com ID:', id); //OBSERVABILIDADE
   };
 
   const handleDelete = async (id) => {
     try {
       await api.delete(`/tiposprocessos/${id}`);
       setTiposProcessos(tiposProcessos.filter(tipo => tipo.id !== id));
-      console.log('Excluir tipo de processo com ID:', id);
+      console.log('Excluir tipo de processo com ID:', id); //OBSERVABILIDADE
     } catch (error) {
       console.error('Erro ao excluir tipo de processo:', error);
     }
