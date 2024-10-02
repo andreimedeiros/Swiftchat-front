@@ -1,16 +1,53 @@
-import React, { useState } from 'react';
-import { Container, Typography, Box, Modal, Paper, Grid, Card, CardContent } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Container, Typography, Box, Modal, Paper, Grid, Card, CardContent, TextField, Button } from '@mui/material';
 import Login from './Login';
+import api from '../services/api';
 
 const Home = () => {
   const [loginOpen, setLoginOpen] = useState(false);
+  const [configOpen, setConfigOpen] = useState(false);
+  const [nome, setNome] = useState('');
+  const [sobrenome, setSobrenome] = useState('');
+  const [userData, setUserData] = useState(null);
+
   const userName = localStorage.getItem('userName'); // Verifica se há um usuário logado
+  const userId = localStorage.getItem('userId'); 
 
   const handleLoginClose = () => {
     setLoginOpen(false);
   };
 
-  // Funções temporárias para obter o número de processos e usuários no sistema
+  const handleConfigOpen = () => setConfigOpen(true);
+  const handleConfigClose = () => setConfigOpen(false);
+
+  useEffect(() => {
+    if (userId) {
+      api.get(`/usuarios/${userId}`)
+        .then((response) => {
+          setUserData(response.data);
+          setNome(response.data.nome);
+          setSobrenome(response.data.sobrenome);
+        })
+        .catch((error) => console.error('Erro ao buscar dados do usuário:', error));
+    }
+  }, [userId]);
+
+  const handleUpdateUser = () => {
+    const updateData = {
+      nome,
+      sobrenome,
+    };
+
+    api.put(`/usuarios/${userId}`, updateData)
+      .then((response) => {
+        alert('Nome atualizado com sucesso!');
+        setUserData(response.data);
+        setConfigOpen(false);
+      })
+      .catch((error) => console.error('Erro ao atualizar nome:', error));
+  };
+
+  
   
 
   return (
@@ -80,7 +117,7 @@ const Home = () => {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <Card>
+                <Card onClick={handleConfigOpen} sx={{ cursor: 'pointer' }}>
                   <CardContent>
                     <Typography variant="h6" color="primary">
                       Configurações
@@ -105,7 +142,7 @@ const Home = () => {
               </Grid>
             </>
           ) : (
-            // Exibe informações gerais se ninguém estiver logado
+            
             <>
               <Grid item xs={12} sm={6} md={3}>
                 <Card>
@@ -159,6 +196,48 @@ const Home = () => {
           )}
         </Grid>
       </Box>
+
+      <Modal
+        open={configOpen}
+        onClose={handleConfigClose}
+        aria-labelledby="modal-config-title"
+        aria-describedby="modal-config-description"
+      >
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          sx={{ height: '100vh' }}
+        >
+          <Paper elevation={3} sx={{ padding: 4 }}>
+            <Typography variant="h6" id="modal-config-title" gutterBottom>
+              Atualizar Nome e Sobrenome
+            </Typography>
+            <TextField
+              label="Nome"
+              fullWidth
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              margin="normal"
+            />
+            <TextField
+              label="Sobrenome"
+              fullWidth
+              value={sobrenome}
+              onChange={(e) => setSobrenome(e.target.value)}
+              margin="normal"
+            />
+            <Box display="flex" justifyContent="flex-end" mt={2}>
+              <Button variant="contained" color="primary" onClick={handleUpdateUser}>
+                Salvar
+              </Button>
+              <Button onClick={handleConfigClose} sx={{ ml: 2 }}>
+                Cancelar
+              </Button>
+            </Box>
+          </Paper>
+        </Box>
+      </Modal>
 
       <Modal
         open={loginOpen}
