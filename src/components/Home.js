@@ -86,11 +86,11 @@ const Home = () => {
         </Typography>
       </Box>
 
-      {/* Seção de Cards */}
+      
       <Box sx={{ width: '100%', marginTop: 4 }}>
         <Grid container spacing={2} justifyContent="center">
           {userName ? (
-            // Exibe os principais acessos para o usuário logado
+           
             <>
               <Grid item xs={12} sm={6} md={3}>
                 <Card>
