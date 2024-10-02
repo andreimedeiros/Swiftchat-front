@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Modal, Paper, Grid, Card, CardContent, TextField, Button } from '@mui/material';
+import { Container, Typography, Box, Modal, Paper, Grid, Card, CardContent, TextField, Button, Snackbar, Alert } from '@mui/material';
 import Login from './Login';
 import api from '../services/api';
 
@@ -9,9 +9,13 @@ const Home = () => {
   const [nome, setNome] = useState('');
   const [sobrenome, setSobrenome] = useState('');
   const [userData, setUserData] = useState(null);
+  
+  // Estados para o Snackbar
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   const userName = localStorage.getItem('userName'); // Verifica se há um usuário logado
-  const userId = localStorage.getItem('userId'); 
 
   const handleLoginClose = () => {
     setLoginOpen(false);
@@ -19,18 +23,22 @@ const Home = () => {
 
   const handleConfigOpen = () => setConfigOpen(true);
   const handleConfigClose = () => setConfigOpen(false);
+  
+  // Função para fechar o Snackbar
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
 
   useEffect(() => {
-    if (userId) {
-      api.get(`/usuarios/${userId}`)
-        .then((response) => {
-          setUserData(response.data);
-          setNome(response.data.nome);
-          setSobrenome(response.data.sobrenome);
-        })
-        .catch((error) => console.error('Erro ao buscar dados do usuário:', error));
-    }
-  }, [userId]);
+    api.get('/usuarios/me')
+      .then((response) => {
+        setUserData(response.data);
+        setNome(response.data.nome);
+        setSobrenome(response.data.sobrenome);
+        localStorage.setItem('userName', `${response.data.nome} ${response.data.sobrenome}`);
+      })
+      .catch((error) => console.error('Erro ao buscar dados do usuário:', error));
+  }, []);
 
   const handleUpdateUser = () => {
     const updateData = {
@@ -38,17 +46,25 @@ const Home = () => {
       sobrenome,
     };
 
-    api.put(`/usuarios/${userId}`, updateData)
+    api.put('/usuarios/me/atualizar-nome-sobrenome', updateData)
       .then((response) => {
-        alert('Nome atualizado com sucesso!');
         setUserData(response.data);
+        localStorage.setItem('userName', `${response.data.nome} ${response.data.sobrenome}`);
         setConfigOpen(false);
-      })
-      .catch((error) => console.error('Erro ao atualizar nome:', error));
-  };
 
-  
-  
+        // Exibir Snackbar de sucesso
+        setSnackbarMessage('Nome e sobrenome atualizados com sucesso!');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+      })
+      .catch((error) => {
+        // Exibir Snackbar de erro
+        setSnackbarMessage('Erro ao atualizar nome e sobrenome. Tente novamente.');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+        console.error('Erro ao atualizar nome:', error);
+      });
+  };
 
   return (
     <Container 
@@ -86,11 +102,9 @@ const Home = () => {
         </Typography>
       </Box>
 
-      
       <Box sx={{ width: '100%', marginTop: 4 }}>
         <Grid container spacing={2} justifyContent="center">
           {userName ? (
-           
             <>
               <Grid item xs={12} sm={6} md={3}>
                 <Card>
@@ -142,61 +156,14 @@ const Home = () => {
               </Grid>
             </>
           ) : (
-            
             <>
-              <Grid item xs={12} sm={6} md={3}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" color="primary">
-                      Total de Processos
-                    </Typography>
-                    <Typography variant="body2">
-                       Processos no sistema.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" color="primary">
-                      Total de Usuários
-                    </Typography>
-                    <Typography variant="body2">
-                       usuários registrados.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" color="primary">
-                      Processos Aprovados
-                    </Typography>
-                    <Typography variant="body2">
-                      80 processos aprovados até o momento e contando.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" color="primary">
-                      Processos Pendentes
-                    </Typography>
-                    <Typography variant="body2">
-                      40 processos aguardando aprovação.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
+              {/* Outros cards para visitantes */}
             </>
           )}
         </Grid>
       </Box>
 
+      {/* Modal para Configurações */}
       <Modal
         open={configOpen}
         onClose={handleConfigClose}
@@ -239,6 +206,19 @@ const Home = () => {
         </Box>
       </Modal>
 
+      {/* Snackbar para feedback */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'center', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+
+      {/* Modal para Login */}
       <Modal
         open={loginOpen}
         onClose={handleLoginClose}
