@@ -9,13 +9,14 @@ const Home = () => {
   const [nome, setNome] = useState('');
   const [sobrenome, setSobrenome] = useState('');
   const [userData, setUserData] = useState(null);
-  
+
   // Estados para o Snackbar
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
-  const userName = localStorage.getItem('userName'); // Verifica se há um usuário logado
+  // Verifica se há um usuário logado e pega o nome completo do localStorage
+  const userName = localStorage.getItem('userName');
 
   const handleLoginClose = () => {
     setLoginOpen(false);
@@ -23,23 +24,30 @@ const Home = () => {
 
   const handleConfigOpen = () => setConfigOpen(true);
   const handleConfigClose = () => setConfigOpen(false);
-  
+
   // Função para fechar o Snackbar
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
 
+  // Fetch para buscar os dados do usuário logado
   useEffect(() => {
     api.get('/usuarios/me')
       .then((response) => {
         setUserData(response.data);
         setNome(response.data.nome);
         setSobrenome(response.data.sobrenome);
-        localStorage.setItem('userName', `${response.data.nome} ${response.data.sobrenome}`);
+        
+        // Agora, setando o nome completo corretamente no localStorage
+        const nomeCompleto = `${response.data.nome} ${response.data.sobrenome}`;
+        localStorage.setItem('userName', nomeCompleto);  // Armazena nome completo no localStorage
       })
       .catch((error) => console.error('Erro ao buscar dados do usuário:', error));
   }, []);
+  
+  
 
+  // Função para atualizar nome e sobrenome
   const handleUpdateUser = () => {
     const updateData = {
       nome,

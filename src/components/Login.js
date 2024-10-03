@@ -14,11 +14,13 @@ const Login = ({ onClose }) => {
 
   axiosRetry(axios, {
     retries: 3,
-    retryDelay: (retryCount) => retryCount * 1000, // TOLERÂNCIA A FALAHAS -> Tenta 3 vezes em caso de erro
+    retryDelay: (retryCount) => retryCount * 1000, // Tolerância a Falhas -> Tenta 3 vezes em caso de erro
     retryCondition: (error) => error.response.status >= 500, // Somente tenta de novo em erros 5xx (falha no servidor)
   });
-  // Função pra remover caracteres nao numericos
+
+  // Função pra remover caracteres não numéricos
   const limparFormato = (valor) => valor.replace(/\D/g, '');
+
   // Função pra formatar CPF e CNPJ conforme o usuário digita
   const formatarCpfCnpj = (valor) => {
     valor = limparFormato(valor);
@@ -35,51 +37,46 @@ const Login = ({ onClose }) => {
   };
 
   const handleLogin = async (event) => {
-    event.preventDefault();  // Previne o comportamento padrão do submit
-
+    event.preventDefault();  
+  
     try {
       const cleanCpfCnpj = limparFormato(cpfCnpj);
       const response = await axios.post('http://localhost:8080/api/login', {
         cpfCnpj: cleanCpfCnpj,
         password,
       }, {
-        timeout: 5000, // Tolerancia a Falhas:Timeout de 5 segundos
+        timeout: 5000,
       });
-
-      const { token, userType, userName } = response.data;
-
+  
+      const { token, userType, userName } = response.data;  // userName já será o nome completo
+  
       console.log(`Login bem-sucedido para o usuário: ${userName} (${userType})`);
-
+  
       localStorage.setItem('token', token);
       localStorage.setItem('userType', userType);
       localStorage.setItem('userName', userName);
-
+  
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
+  
       navigate('/home');
       onClose();
     } catch (error) {
-      // Log de erro no login
       if (error.code === 'ECONNABORTED') {
-        console.warn('A conexão demorou muito para responder.');
-        setSnackbarMessage('A conexão demorou muito para responder. Por favor, tente novamente mais tarde.');
+        setSnackbarMessage('A conexão demorou muito para responder.');
       } else if (error.response) {
-        console.error(`Erro no login: ${error.response.status} - ${error.response.data}`);
-        if (error.response.status >= 500) {
-          setSnackbarMessage('Erro no servidor. Estamos tentando novamente...');
-        } else if (error.response.status === 401) {
-          setSnackbarMessage('Credenciais inválidas. Verifique CPF/CNPJ e senha.');
+        if (error.response.status === 401) {
+          setSnackbarMessage('Credenciais inválidas.');
         } else {
-          setSnackbarMessage('Erro ao fazer login. Tente novamente.');
+          setSnackbarMessage('Erro ao fazer login.');
         }
       } else {
-        console.error('Erro desconhecido ao fazer login:', error);
-        setSnackbarMessage('Erro ao fazer login. Por favor, verifique sua conexão.');
+        setSnackbarMessage('Erro ao fazer login. Verifique sua conexão.');
       }
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
   };
+  
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
