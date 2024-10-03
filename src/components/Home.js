@@ -9,14 +9,13 @@ const Home = () => {
   const [nome, setNome] = useState('');
   const [sobrenome, setSobrenome] = useState('');
   const [userData, setUserData] = useState(null);
-
+  
   // Estados para o Snackbar
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
-  // Verifica se há um usuário logado e pega o nome completo do localStorage
-  const userName = localStorage.getItem('userName');
+  const userName = localStorage.getItem('userName'); // Verifica se há um usuário logado
 
   const handleLoginClose = () => {
     setLoginOpen(false);
@@ -24,30 +23,25 @@ const Home = () => {
 
   const handleConfigOpen = () => setConfigOpen(true);
   const handleConfigClose = () => setConfigOpen(false);
-
+  
   // Função para fechar o Snackbar
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
 
-  // Fetch para buscar os dados do usuário logado
   useEffect(() => {
-    api.get('/usuarios/me')
-      .then((response) => {
-        setUserData(response.data);
-        setNome(response.data.nome);
-        setSobrenome(response.data.sobrenome);
-        
-        // Agora, setando o nome completo corretamente no localStorage
-        const nomeCompleto = `${response.data.nome} ${response.data.sobrenome}`;
-        localStorage.setItem('userName', nomeCompleto);  // Armazena nome completo no localStorage
-      })
-      .catch((error) => console.error('Erro ao buscar dados do usuário:', error));
-  }, []);
-  
-  
+    if (userName) {
+      api.get('/usuarios/me')
+        .then((response) => {
+          setUserData(response.data);
+          setNome(response.data.nome);
+          setSobrenome(response.data.sobrenome);
+          localStorage.setItem('userName', `${response.data.nome} ${response.data.sobrenome}`);
+        })
+        .catch((error) => console.error('Erro ao buscar dados do usuário:', error));
+    }
+  }, [userName]);
 
-  // Função para atualizar nome e sobrenome
   const handleUpdateUser = () => {
     const updateData = {
       nome,
@@ -112,62 +106,58 @@ const Home = () => {
 
       <Box sx={{ width: '100%', marginTop: 4 }}>
         <Grid container spacing={2} justifyContent="center">
-          {userName ? (
-            <>
-              <Grid item xs={12} sm={6} md={3}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" color="primary">
-                      Processos Recentes
-                    </Typography>
-                    <Typography variant="body2">
-                      Acesse rapidamente seus processos recentes.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" color="primary">
-                      Aprovações Pendentes
-                    </Typography>
-                    <Typography variant="body2">
-                      Veja os processos aguardando sua aprovação.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Card onClick={handleConfigOpen} sx={{ cursor: 'pointer' }}>
-                  <CardContent>
-                    <Typography variant="h6" color="primary">
-                      Configurações
-                    </Typography>
-                    <Typography variant="body2">
-                      Personalize suas preferências e configurações.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" color="primary">
-                      Relatórios
-                    </Typography>
-                    <Typography variant="body2">
-                      Acesse os relatórios de desempenho e resultados.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </>
-          ) : (
-            <>
-              {/* Outros cards para visitantes */}
-            </>
+          {/* Exibe os cards para todos os usuários */}
+          <Grid item xs={12} sm={6} md={3}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" color="primary">
+                  Processos Recentes
+                </Typography>
+                <Typography variant="body2">
+                  Acesse rapidamente seus processos recentes.
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" color="primary">
+                  Aprovações Pendentes
+                </Typography>
+                <Typography variant="body2">
+                  Veja os processos aguardando sua aprovação.
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          {/* O card de Configurações só é exibido se o usuário estiver logado */}
+          {userName && (
+            <Grid item xs={12} sm={6} md={3}>
+              <Card onClick={handleConfigOpen} sx={{ cursor: 'pointer' }}>
+                <CardContent>
+                  <Typography variant="h6" color="primary">
+                    Configurações
+                  </Typography>
+                  <Typography variant="body2">
+                    Personalize suas preferências e configurações.
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
           )}
+          <Grid item xs={12} sm={6} md={3}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" color="primary">
+                  Relatórios
+                </Typography>
+                <Typography variant="body2">
+                  Acesse os relatórios de desempenho e resultados.
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
       </Box>
 
