@@ -95,8 +95,6 @@ const ListaProcessos = () => {
       console.error('Erro ao baixar o arquivo:', error);
     }
   };
-  
-
 
   const handleAvaliar = (id) => {
     navigate(`/avaliar-processo/${id}`);
@@ -146,6 +144,7 @@ const ListaProcessos = () => {
                 <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Tipo de Processo</TableCell>
                 <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Descrição</TableCell>
                 <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Status</TableCell>
+                <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Observação</TableCell> {/* Nova coluna */}
                 <TableCell style={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -158,6 +157,9 @@ const ListaProcessos = () => {
                   <TableCell>{processo.tipoProcesso ? processo.tipoProcesso.nome : ''}</TableCell>
                   <TableCell>{processo.descricao}</TableCell>
                   <TableCell>{processo.statusProcesso ? processo.statusProcesso : 'Em trâmite'}</TableCell>
+                  <TableCell>
+                    {processo.statusProcesso === 'Indeferido' ? processo.observacao : 'N/A'}
+                  </TableCell> {/* Exibe observação se for Indeferido */}
                   <TableCell>
                     {userType === 'FUNCIONARIO' && userSetor !== 'Setor Intermediario' && (
                       <Button
@@ -178,35 +180,33 @@ const ListaProcessos = () => {
                       Download
                     </Button>
 
-                    {/* Botão de Editar visível apenas para USUARIOS */}
                     {userType === 'USUARIO' && (
-                      <Button
-                        variant="outlined"
-                        color="info"
-                        startIcon={<EditIcon />}
-                        onClick={() => handleEditar(processo.id)}
-                      >
-                        Editar
-                      </Button>
-                    )}
+                      <>
+                        <Button
+                          variant="outlined"
+                          color="info"
+                          startIcon={<EditIcon />}
+                          onClick={() => handleEditar(processo.id)}
+                        >
+                          Editar
+                        </Button>
 
-                    {/* Botão de Excluir visível apenas para USUARIOS */}
-                    {userType === 'USUARIO' && (
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        startIcon={<DeleteIcon />}
-                        onClick={() => handleOpenDeleteDialog(processo)}
-                      >
-                        Excluir
-                      </Button>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          startIcon={<DeleteIcon />}
+                          onClick={() => handleOpenDeleteDialog(processo)}
+                        >
+                          Excluir
+                        </Button>
+                      </>
                     )}
                   </TableCell>
                 </TableRow>
               ))}
               {filteredProcessos.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} align="center">
+                  <TableCell colSpan={8} align="center">
                     Nenhum processo encontrado.
                   </TableCell>
                 </TableRow>

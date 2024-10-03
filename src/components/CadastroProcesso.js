@@ -28,7 +28,7 @@ const CadastroProcesso = ({ onSubmit = () => {} }) => {
 
   // TOLERÂNCIA A FALHAS: timeout global para requisições
   const apiInstance = api.create({
-    baseURL: '/api',
+    baseURL: 'http://localhost:8080/api',
     timeout: 5000,  // Timeout 
   });
 
