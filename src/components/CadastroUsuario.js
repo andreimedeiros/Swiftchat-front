@@ -57,16 +57,15 @@ const CadastroUsuario = () => {
     event.preventDefault();
 
     const nomeValido = /^[A-Z]/.test(nome);
-    const sobrenomeValido = /^[A-Z]/.test(sobrenome);
+    const sobrenomeValido = tipoPessoa === 'fisica' ? /^[A-Z]/.test(sobrenome) : true;
     
-  
-
     if (!nomeValido || !sobrenomeValido) {
-        setSnackbarMessage('O nome e o sobrenome devem começar com letra maiúscula.');
-        setSnackbarSeverity('error');
-        setSnackbarOpen(true);
-        return;
+      setSnackbarMessage('O nome e o sobrenome devem começar com letra maiúscula.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      return;
     }
+    
 
     if (senha !== confirmarSenha) {
       setSnackbarMessage('As senhas não coincidem. Tente novamente.');
@@ -90,9 +89,11 @@ const CadastroUsuario = () => {
       razaoSocial: tipoPessoa === 'juridica' ? razaoSocial : null,
       password: senha,
       tipoUsuario: parseInt(tipoUsuario),
+      tipoPessoa: tipoPessoa.toUpperCase(), // Ajuste aqui para enviar 'FISICA' ou 'JURIDICA'
       matricula: tipoUsuario === '2' ? matricula : null,
-      setor: tipoUsuario === '2' ? { id: setorSelecionado } : null // Enviar setor se for funcionário
+      setor: tipoUsuario === '2' ? { id: setorSelecionado } : null
     };
+    
 
     try {
       // Requisição de cadastro de usuário sem token
