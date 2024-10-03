@@ -8,7 +8,7 @@ const Home = () => {
   const [configOpen, setConfigOpen] = useState(false);
   const [nome, setNome] = useState('');
   const [sobrenome, setSobrenome] = useState('');
-  const [setUserData] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [usuarioCount, setUsuarioCount] = useState(0); // Estado para quantidade de usuários
   const [processoMaisCriado, setProcessoMaisCriado] = useState(''); // Estado para o tipo de processo mais criado
   
