@@ -8,7 +8,9 @@ const Home = () => {
   const [configOpen, setConfigOpen] = useState(false);
   const [nome, setNome] = useState('');
   const [sobrenome, setSobrenome] = useState('');
-  const [userData, setUserData] = useState(null);
+  const [setUserData] = useState(null);
+  const [usuarioCount, setUsuarioCount] = useState(0); // Estado para quantidade de usuários
+  const [processoMaisCriado, setProcessoMaisCriado] = useState(''); // Estado para o tipo de processo mais criado
   
   // Estados para o Snackbar
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -40,6 +42,20 @@ const Home = () => {
         })
         .catch((error) => console.error('Erro ao buscar dados do usuário:', error));
     }
+
+    // Requisição para buscar a quantidade de usuários cadastrados
+    api.get('/usuarios/count')
+      .then((response) => {
+        setUsuarioCount(response.data);
+      })
+      .catch((error) => console.error('Erro ao buscar quantidade de usuários:', error));
+
+    // Requisição para buscar o tipo de processo mais criado
+    api.get('/processos/mais-criado')
+      .then((response) => {
+        setProcessoMaisCriado(response.data);
+      })
+      .catch((error) => console.error('Erro ao buscar processo mais criado:', error));
   }, [userName]);
 
   const handleUpdateUser = () => {
@@ -111,10 +127,10 @@ const Home = () => {
             <Card>
               <CardContent>
                 <Typography variant="h6" color="primary">
-                  Processos Recentes
+                  Quantidade de Usuários
                 </Typography>
                 <Typography variant="body2">
-                  Acesse rapidamente seus processos recentes.
+                  {usuarioCount} usuários cadastrados.
                 </Typography>
               </CardContent>
             </Card>
@@ -123,10 +139,10 @@ const Home = () => {
             <Card>
               <CardContent>
                 <Typography variant="h6" color="primary">
-                  Aprovações Pendentes
+                  Processo Mais Criado
                 </Typography>
                 <Typography variant="body2">
-                  Veja os processos aguardando sua aprovação.
+                  {processoMaisCriado || 'Nenhum processo encontrado'}
                 </Typography>
               </CardContent>
             </Card>
@@ -146,18 +162,6 @@ const Home = () => {
               </Card>
             </Grid>
           )}
-          <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" color="primary">
-                  Relatórios
-                </Typography>
-                <Typography variant="body2">
-                  Acesse os relatórios de desempenho e resultados.
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
         </Grid>
       </Box>
 
